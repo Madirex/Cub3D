@@ -12,7 +12,6 @@ cub3D/
 ├── src/ # Source code
 ├── maps/ # Example .cub map files
 ├── Makefile
-└── main.c
 ```
 
 ## ⚙️ Compilation
