@@ -61,7 +61,7 @@ This project uses:
 
   `minilibx-linux`
 
-  X11 libraries (for Linux)
+  `X11 libraries (for Linux)`
 
 Make sure you have the following packages:
 
