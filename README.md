@@ -8,9 +8,10 @@
 cub3D/
 ├── includes/ # Header files
 ├── libs/ # External libraries (libft, minilibx)
+├── maps/ # Example .cub map files
 ├── obj/ # Object files
 ├── src/ # Source code
-├── maps/ # Example .cub map files
+├── textures/ # Textures
 ├── Makefile
 ```
 
