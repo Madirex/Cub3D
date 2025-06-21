@@ -6,12 +6,12 @@
 
 ```
 cub3D/
-├── includes/ # Header files
-├── libs/ # External libraries (libft, minilibx)
-├── maps/ # Example .cub map files
-├── obj/ # Object files
-├── src/ # Source code
-├── textures/ # Textures
+├── includes/
+├── libs/
+├── maps/
+├── obj/
+├── src/
+├── textures/
 ├── Makefile
 ```
 
