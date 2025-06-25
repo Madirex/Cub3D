@@ -7,7 +7,11 @@ MFLAGS      = -L$(LIB_DIR)minilibx-linux -lmlx -lXext -lX11 -lm -lz
 CFLAGS      = -Wall -Werror -Wextra -g
 LIBFT_PATH  = $(LIB_DIR)libft/libft.a
 
-SRC_FILES   = main
+SRC_FILES   = main \
+			  parsing/parse_textures  \
+			  debug/debug_print \
+			  utils/utils
+
 
 OBJS        = $(addprefix $(OBJS_DIR), $(addsuffix .o, $(SRC_FILES)))
 
