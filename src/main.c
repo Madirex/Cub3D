@@ -1,4 +1,105 @@
-int	main()
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include "../includes/cub3d.h"
+#include "../includes/parse_textures.h"
+#include "../includes/debug.h"
+#include "../includes/utils.h"
+
+void	validate_textures(t_cub3d *cub)
 {
+	if (!cub->textures.no || !cub->textures.so || !cub->textures.we || !cub->textures.ea ||
+		cub->textures.floor.r == -1 || cub->textures.floor.g == -1 || cub->textures.floor.b == -1 ||
+		cub->textures.ceiling.r == -1 || cub->textures.ceiling.g == -1 || cub->textures.ceiling.b == -1)
+	{
+		fprintf(stderr, "Error: Missing required fields in .cub file\n");
+		safe_exit(cub, NULL);
+	}
+}
+
+void read_map(int fd, t_cub3d *cub)
+{
+	char *line = NULL;
+	int cap = 128;
+	int len = 0;
+	char c;
+	int n;
+
+	line = (char *)malloc(cap);
+	if (!line)
+		safe_exit(cub, NULL);
+	while ((n = read(fd, &c, 1)) > 0)
+	{
+		if (c == '\n')
+		{
+			line[len] = '\0';
+			if (line[0] != '\0')
+			{
+				if (is_texture_line(line, "NO ") ||
+					is_texture_line(line, "SO ") ||
+					is_texture_line(line, "WE ") ||
+					is_texture_line(line, "EA "))
+				{
+					assign_texture(cub, line);
+				}
+				else if (is_color_line(line, 'F'))
+					assign_color(&cub->textures.floor, line, "F");
+				else if (is_color_line(line, 'C'))
+					assign_color(&cub->textures.ceiling, line, "C");
+			}
+			len = 0;
+			line[0] = '\0';
+			continue;
+		}
+		line[len++] = c;
+		if (len + 1 >= cap)
+		{
+			cap *= 2;
+			char *tmp = (char *)malloc(cap);
+			if (!tmp)
+				safe_exit(cub, line);
+			ft_memcpy(tmp, line, len);
+			free(line);
+			line = tmp;
+		}
+	}
+	free(line);
+	print_textures_debug(cub);
+	validate_textures(cub);
+}
+
+int is_map_char(char c)
+{
+	return (c == '1' || c == '0' || c == 'N' || c == 'S' || c == 'E' || c == 'W');
+}
+
+int	main(int argc, char *argv[])
+{
+	int fd;
+	t_cub3d cub;
+
+	ft_memset(&cub, 0, sizeof(t_cub3d));
+	cub.textures.floor.r = -1;
+	cub.textures.floor.g = -1;
+	cub.textures.floor.b = -1;
+	cub.textures.ceiling.r = -1;
+	cub.textures.ceiling.g = -1;
+	cub.textures.ceiling.b = -1;
+	if (argc != 2)
+	{
+		fprintf(stderr, "Use: %s <map.cub>\n", argv[0]);
+		return (1);
+	}
+	fd = open(argv[1], O_RDONLY);
+	if (fd < 0)
+	{
+		perror("Error\n");
+		return (1);
+	}
+	read_map(fd, &cub);
+	close(fd);
+	validate_textures(&cub);
+	free_textures(&cub.textures);
 	return (0);
 }
