@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "../includes/cub3d.h"
 #include "../includes/parse_textures.h"
+#include "../includes/parse_map.h"
 #include "../includes/debug.h"
 #include "../includes/utils.h"
 
@@ -69,11 +70,6 @@ void read_map(int fd, t_cub3d *cub)
 	validate_textures(cub);
 }
 
-int is_map_char(char c)
-{
-	return (c == '1' || c == '0' || c == 'N' || c == 'S' || c == 'E' || c == 'W');
-}
-
 int	main(int argc, char *argv[])
 {
 	int fd;
@@ -100,6 +96,10 @@ int	main(int argc, char *argv[])
 	read_map(fd, &cub);
 	close(fd);
 	validate_textures(&cub);
+	assign_map(&cub, argv[1]);
+	print_map_debug(&cub);
 	free_textures(&cub.textures);
+	if (cub.map)
+		free_map(cub.map, cub.map_height);
 	return (0);
 }
