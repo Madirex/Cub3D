@@ -4,5 +4,6 @@
 # include "../../includes/cub3d.h"
 
 void print_textures_debug(t_cub3d *cub);
+void print_map_debug(t_cub3d *cub);
 
 #endif

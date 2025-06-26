@@ -17,3 +17,19 @@ void print_textures_debug(t_cub3d *cub)
 	if (cub->textures.ceiling.r != -1)
 		printf("Ceiling: %d,%d,%d\n", cub->textures.ceiling.r, cub->textures.ceiling.g, cub->textures.ceiling.b);
 }
+
+void print_map_debug(t_cub3d *cub)
+{
+	printf("[Debug] Map (%dx%d):\n", cub->map_width, cub->map_height);
+	if (!cub->map)
+	{
+		printf("No map loaded\n");
+		return;
+	}
+	
+	for (int i = 0; i < cub->map_height; i++)
+	{
+		printf("%2d: %s\n", i, cub->map[i]);
+	}
+	printf("\n");
+}
