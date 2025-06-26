@@ -27,9 +27,11 @@ void print_map_debug(t_cub3d *cub)
 		return;
 	}
 	
-	for (int i = 0; i < cub->map_height; i++)
+	int i = 0;
+	while (i < cub->map_height)
 	{
 		printf("%2d: %s\n", i, cub->map[i]);
+		i++;
 	}
 	printf("\n");
 }
