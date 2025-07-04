@@ -29,9 +29,9 @@ void	free_textures(t_textures *textures)
 void	free_map(char **map, int height)
 {
 	int	i;
-	
+
 	if (!map)
-		return;
+		return ;
 	i = 0;
 	while (i < height)
 	{

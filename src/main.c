@@ -22,24 +22,26 @@
 
 void	validate_textures(t_cub3d *cub)
 {
-	if (!cub->textures.no || !cub->textures.so || !cub->textures.we || !cub->textures.ea ||
-		cub->textures.floor.r == -1 || cub->textures.floor.g == -1 || cub->textures.floor.b == -1 ||
-		cub->textures.ceiling.r == -1 || cub->textures.ceiling.g == -1 || cub->textures.ceiling.b == -1)
+	if (!cub->textures.no || !cub->textures.so || !cub->textures.we || !cub->textures.ea
+		|| cub->textures.floor.r == -1 || cub->textures.floor.g == -1 || cub->textures.floor.b == -1
+		|| cub->textures.ceiling.r == -1 || cub->textures.ceiling.g == -1 || cub->textures.ceiling.b == -1)
 	{
 		fprintf(stderr, "Error: Missing required fields in .cub file\n");
 		safe_exit(cub, NULL);
 	}
 }
 
-void read_map(int fd, t_cub3d *cub)
+void	read_map(int fd, t_cub3d *cub)
 {
-	char *line = NULL;
-	int cap = 128;
-	int len = 0;
-	char c;
-	int n;
+	char	*line;
+	int		cap;
+	int		len;
+	char	c;
+	int		n;
 
+	cap = 128;
 	line = (char *)malloc(cap);
+	len = 0;
 	if (!line)
 		safe_exit(cub, NULL);
 	while ((n = read(fd, &c, 1)) > 0)
@@ -49,10 +51,10 @@ void read_map(int fd, t_cub3d *cub)
 			line[len] = '\0';
 			if (line[0] != '\0')
 			{
-				if (is_texture_line(line, "NO ") ||
-					is_texture_line(line, "SO ") ||
-					is_texture_line(line, "WE ") ||
-					is_texture_line(line, "EA "))
+				if (is_texture_line(line, "NO ")
+					|| is_texture_line(line, "SO ")
+					|| is_texture_line(line, "WE ")
+					|| is_texture_line(line, "EA "))
 				{
 					assign_texture(cub, line);
 				}
@@ -63,7 +65,7 @@ void read_map(int fd, t_cub3d *cub)
 			}
 			len = 0;
 			line[0] = '\0';
-			continue;
+			continue ;
 		}
 		line[len++] = c;
 		if (len + 1 >= cap)
@@ -84,8 +86,8 @@ void read_map(int fd, t_cub3d *cub)
 
 int	main(int argc, char *argv[])
 {
-	int fd;
-	t_cub3d cub;
+	int		fd;
+	t_cub3d	cub;
 
 	ft_memset(&cub, 0, sizeof(t_cub3d));
 	cub.textures.floor.r = -1;
