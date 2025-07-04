@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #ifndef PARSE_TEXTURES_H
-#define PARSE_TEXTURES_H
+# define PARSE_TEXTURES_H
 
-#include "cub3d.h"
+# include "cub3d.h"
 
 int		is_texture_line(const char *line, const char *id);
 int		is_color_line(const char *line, char id);
