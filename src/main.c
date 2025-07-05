@@ -73,6 +73,18 @@ void	read_map(int fd, t_cub3d *cub)
 					assign_color(&cub->textures.floor, line);
 				else if (is_color_line(line, 'C'))
 					assign_color(&cub->textures.ceiling, line);
+				else
+				{
+					if (is_map_line(line))
+					{
+						if (!cub->textures.no || !cub->textures.so || !cub->textures.we || !cub->textures.ea ||
+							cub->textures.floor.r == -1 || cub->textures.ceiling.r == -1)
+							ft_error("Map found before all configuration elements are defined", cub, line);
+						break;
+					}
+					else
+						ft_error("Invalid configuration line", cub, line);
+				}
 			}
 			len = 0;
 			line[0] = '\0';
