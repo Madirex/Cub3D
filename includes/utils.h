@@ -15,6 +15,6 @@
 
 # include "cub3d.h"
 
-void	safe_exit(t_cub3d *cub, char *line);
+void	ft_error(char *message, t_cub3d *cub, char *line);
 
 #endif

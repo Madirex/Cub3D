@@ -99,17 +99,14 @@ void	assign_map(t_cub3d *cub, char *filename)
 
 	fd = open(filename, O_RDONLY);
 	if (fd < 0)
-	{
-		printf("Error: File could not be opened: %s\n", filename);
-		safe_exit(cub, NULL);
-	}
+		ft_error("File could not be opened", cub, NULL);
 	map_capacity = 10;
 	map_lines = 0;
 	reading_map = 0;
 	cub->map_width = 0;
 	temp_map = (char **)malloc(sizeof(char *) * map_capacity);
 	if (!temp_map)
-		safe_exit(cub, NULL);
+		ft_error("Memory allocation failed for map", cub, NULL);
 	while ((line = read_line(fd)) != NULL)
 	{
 		if (reading_map && (ft_strlen(line) == 0))
@@ -127,7 +124,7 @@ void	assign_map(t_cub3d *cub, char *filename)
 				if (!new_temp)
 				{
 					free_map(temp_map, map_lines);
-					safe_exit(cub, line);
+					ft_error("Memory allocation failed for map expansion", cub, line);
 				}
 				int i = 0;
 				while (i < map_lines)
@@ -142,7 +139,7 @@ void	assign_map(t_cub3d *cub, char *filename)
 			if (!temp_map[map_lines])
 			{
 				free_map(temp_map, map_lines);
-				safe_exit(cub, line);
+				ft_error("Memory allocation failed for map line", cub, line);
 			}
 			if ((int)ft_strlen(line) > cub->map_width)
 				cub->map_width = ft_strlen(line);
@@ -153,9 +150,8 @@ void	assign_map(t_cub3d *cub, char *filename)
 	close(fd);
 	if (map_lines == 0)
 	{
-		printf("Error: No valid map found in the file\n");
 		free(temp_map);
-		safe_exit(cub, NULL);
+		ft_error("No valid map found in the file", cub, NULL);
 	}
 	cub->map = temp_map;
 	cub->map_height = map_lines;

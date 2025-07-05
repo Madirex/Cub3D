@@ -15,7 +15,7 @@
 #include "../../includes/cub3d.h"
 #include "../../includes/map_utils.h"
 
-void	safe_exit(t_cub3d *cub, char *line)
+static void	safe_exit(t_cub3d *cub, char *line)
 {
 	if (cub)
 	{
@@ -26,4 +26,12 @@ void	safe_exit(t_cub3d *cub, char *line)
 	if (line)
 		free(line);
 	exit(1);
+}
+
+void	ft_error(char *message, t_cub3d *cub, char *line)
+{
+	printf("Error\n");
+	if (message)
+		printf("%s\n", message);
+	safe_exit(cub, line);
 }

@@ -26,10 +26,7 @@ void	validate_textures(t_cub3d *cub)
 	if (!cub->textures.no || !cub->textures.so || !cub->textures.we || !cub->textures.ea
 		|| cub->textures.floor.r == -1 || cub->textures.floor.g == -1 || cub->textures.floor.b == -1
 		|| cub->textures.ceiling.r == -1 || cub->textures.ceiling.g == -1 || cub->textures.ceiling.b == -1)
-	{
-		fprintf(stderr, "Error: Missing required fields in .cub file\n");
-		safe_exit(cub, NULL);
-	}
+		ft_error("Missing required fields in .cub file", cub, NULL);
 }
 
 void	read_map(int fd, t_cub3d *cub)
@@ -44,7 +41,7 @@ void	read_map(int fd, t_cub3d *cub)
 	line = (char *)malloc(cap);
 	len = 0;
 	if (!line)
-		safe_exit(cub, NULL);
+		ft_error("Memory allocation failed for line", cub, NULL);
 	while ((n = read(fd, &c, 1)) > 0)
 	{
 		if (c == '\n')
@@ -60,9 +57,9 @@ void	read_map(int fd, t_cub3d *cub)
 					assign_texture(cub, line);
 				}
 				else if (is_color_line(line, 'F'))
-					assign_color(&cub->textures.floor, line, "F");
+					assign_color(&cub->textures.floor, line);
 				else if (is_color_line(line, 'C'))
-					assign_color(&cub->textures.ceiling, line, "C");
+					assign_color(&cub->textures.ceiling, line);
 			}
 			len = 0;
 			line[0] = '\0';
@@ -74,7 +71,7 @@ void	read_map(int fd, t_cub3d *cub)
 			cap *= 2;
 			char *tmp = (char *)malloc(cap);
 			if (!tmp)
-				safe_exit(cub, line);
+				ft_error("Memory allocation failed for line expansion", cub, line);
 			ft_memcpy(tmp, line, len);
 			free(line);
 			line = tmp;
@@ -104,10 +101,7 @@ int	main(int argc, char *argv[])
 	}
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
-	{
-		perror("Error\n");
-		return (1);
-	}
+		ft_error("Cannot open file", NULL, NULL);
 	read_map(fd, &cub);
 	close(fd);
 	validate_textures(&cub);
