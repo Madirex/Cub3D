@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include "../../includes/cub3d.h"
 #include "../../includes/parse_map.h"
+#include "../../includes/map_utils.h"
 #include "../../includes/utils.h"
 
 int	is_valid_map_char(char c)

@@ -11,7 +11,8 @@ SRC_FILES   = main \
 			  parsing/parse_textures  \
 			  parsing/parse_map \
 			  debug/debug_print \
-			  utils/utils
+			  utils/utils \
+			  utils/map_utils
 
 
 OBJS        = $(addprefix $(OBJS_DIR), $(addsuffix .o, $(SRC_FILES)))

@@ -18,6 +18,7 @@
 #include "../includes/parse_textures.h"
 #include "../includes/parse_map.h"
 #include "../includes/debug.h"
+#include "../includes/map_utils.h"
 #include "../includes/utils.h"
 
 void	validate_textures(t_cub3d *cub)
