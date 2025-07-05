@@ -85,12 +85,25 @@ void	assign_texture(t_cub3d *cub, char *line)
 void	assign_color(t_rgb *color, char *line)
 {
 	int	i;
+	int	comma_count;
 
 	if (color->r != -1 || color->g != -1 || color->b != -1)
 		ft_error("Color duplicated", NULL, NULL);
 	i = 2;
 	while (line[i] == ' ' || line[i] == '\t')
 		i++;
+	if (!line[i] || line[i] == '\n')
+		ft_error("Missing color values", NULL, NULL);
+	comma_count = 0;
+	int j = i;
+	while (line[j] && line[j] != '\n')
+	{
+		if (line[j] == ',')
+			comma_count++;
+		j++;
+	}
+	if (comma_count != 2)
+		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->r = ft_atoi(&line[i]);
 	while (line[i] && line[i] != ',')
 		i++;
