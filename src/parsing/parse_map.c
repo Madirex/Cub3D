@@ -111,6 +111,18 @@ void	assign_map(t_cub3d *cub, char *filename)
 	{
 		if (reading_map && (ft_strlen(line) == 0))
 		{
+			char *next_line;
+			while ((next_line = read_line(fd)) != NULL)
+			{
+				if (ft_strlen(next_line) > 0)
+				{
+					free(line);
+					free(next_line);
+					free_map(temp_map, map_lines);
+					ft_error("Content found after map ended. Map must be continuous.", cub, NULL);
+				}
+				free(next_line);
+			}
 			free(line);
 			break;
 		}
