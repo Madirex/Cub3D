@@ -21,6 +21,18 @@
 #include "../includes/map_utils.h"
 #include "../includes/utils.h"
 
+int	validate_file_extension(char *filename)
+{
+	int	len;
+
+	len = ft_strlen(filename);
+	if (len < 4)
+		return (0);
+	if (ft_strncmp(filename + len - 4, ".cub", 4) != 0)
+		return (0);
+	return (1);
+}
+
 void	validate_textures(t_cub3d *cub)
 {
 	if (!cub->textures.no || !cub->textures.so || !cub->textures.we || !cub->textures.ea
@@ -99,6 +111,8 @@ int	main(int argc, char *argv[])
 		fprintf(stderr, "Use: %s <map.cub>\n", argv[0]);
 		return (1);
 	}
+	if (!validate_file_extension(argv[1]))
+		ft_error("Invalid file extension. Please use a .cub file", NULL, NULL);
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
 		ft_error("Cannot open file", NULL, NULL);
