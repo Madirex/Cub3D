@@ -145,6 +145,8 @@ void	assign_map(t_cub3d *cub, char *filename)
 				cub->map_width = ft_strlen(line);
 			map_lines++;
 		}
+		else if (reading_map && ft_strlen(line) > 0)
+			ft_error("Invalid character found in map", cub, line);
 		free(line);
 	}
 	close(fd);
