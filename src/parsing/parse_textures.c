@@ -54,6 +54,8 @@ void	assign_color(t_rgb *color, char *line)
 	if (color->r != -1 || color->g != -1 || color->b != -1)
 		ft_error("Color duplicated", NULL, NULL);
 	i = 2;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
 	color->r = ft_atoi(&line[i]);
 	while (line[i] && line[i] != ',')
 		i++;
