@@ -111,14 +111,14 @@ void	assign_color(t_rgb *color, char *line)
 		i++;
 	if (line[i] == ',')
 		i++;
-	if (!ft_isdigit(line[i]))
+	if (!line[i] || !ft_isdigit(line[i]))
 		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->g = ft_atoi(&line[i]);
 	while (line[i] && line[i] != ',')
 		i++;
 	if (line[i] == ',')
 		i++;
-	if (!ft_isdigit(line[i]))
+	if (!line[i] || !ft_isdigit(line[i]))
 		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->b = ft_atoi(&line[i]);
 	if (color->r < 0 || color->r > 255
