@@ -104,16 +104,22 @@ void	assign_color(t_rgb *color, char *line)
 	}
 	if (comma_count != 2)
 		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
+	if (!ft_isdigit(line[i]))
+		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->r = ft_atoi(&line[i]);
 	while (line[i] && line[i] != ',')
 		i++;
 	if (line[i] == ',')
 		i++;
+	if (!ft_isdigit(line[i]))
+		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->g = ft_atoi(&line[i]);
 	while (line[i] && line[i] != ',')
 		i++;
 	if (line[i] == ',')
 		i++;
+	if (!ft_isdigit(line[i]))
+		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->b = ft_atoi(&line[i]);
 	if (color->r < 0 || color->r > 255
 		|| color->g < 0 || color->g > 255
