@@ -25,6 +25,22 @@ int	is_valid_map_char(char c)
 			c == 'E' || c == 'W' || c == ' ' || c == '\t');
 }
 
+int	is_empty_or_whitespace(const char *line)
+{
+	int	i;
+
+	if (!line)
+		return (1);
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n' && line[i] != '\r')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int	is_map_line(const char *line)
 {
 	int	i;
@@ -109,12 +125,12 @@ void	assign_map(t_cub3d *cub, char *filename)
 		ft_error("Memory allocation failed for map", cub, NULL);
 	while ((line = read_line(fd)) != NULL)
 	{
-		if (reading_map && (ft_strlen(line) == 0))
+		if (reading_map && is_empty_or_whitespace(line))
 		{
 			char *next_line;
 			while ((next_line = read_line(fd)) != NULL)
 			{
-				if (ft_strlen(next_line) > 0)
+				if (!is_empty_or_whitespace(next_line))
 				{
 					free(line);
 					free(next_line);
@@ -147,17 +163,18 @@ void	assign_map(t_cub3d *cub, char *filename)
 				free(temp_map);
 				temp_map = new_temp;
 			}
-			temp_map[map_lines] = ft_strdup(line);
-			if (!temp_map[map_lines])
+			char *trimmed_line = ft_strtrim(line, " \t\n\r");
+			if (!trimmed_line)
 			{
 				free_map(temp_map, map_lines);
-				ft_error("Memory allocation failed for map line", cub, line);
+				ft_error("Memory allocation failed for map line trimming", cub, line);
 			}
-			if ((int)ft_strlen(line) > cub->map_width)
-				cub->map_width = ft_strlen(line);
+			temp_map[map_lines] = trimmed_line;
+			if ((int)ft_strlen(trimmed_line) > cub->map_width)
+				cub->map_width = ft_strlen(trimmed_line);
 			map_lines++;
 		}
-		else if (reading_map && ft_strlen(line) > 0)
+		else if (reading_map && !is_empty_or_whitespace(line))
 			ft_error("Invalid character found in map", cub, line);
 		free(line);
 	}

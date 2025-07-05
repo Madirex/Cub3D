@@ -57,19 +57,47 @@ static void	set_texture(char **texture, char *line, int k)
 
 int	is_texture_line(const char *line, const char *id)
 {
-	return (ft_strncmp(line, id, 3) == 0);
+	int	i;
+	int	j;
+
+	if (!line || !id)
+		return (0);
+	i = 0;
+	j = 0;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	while (j < 2 && id[j] && line[i])
+	{
+		if (line[i] != id[j])
+			return (0);
+		i++;
+		j++;
+	}
+	return (j == 2 && (line[i] == ' ' || line[i] == '\t'));
 }
 
 int	is_color_line(const char *line, char id)
 {
-	return (line[0] == id && line[1] == ' ');
+	int	i;
+
+	if (!line)
+		return (0);
+	i = 0;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	return (line[i] == id && (line[i + 1] == ' ' || line[i + 1] == '\t'));
 }
 
 void	assign_texture(t_cub3d *cub, char *line)
 {
 	int	i;
 
-	i = 3;
+	if (!line)
+		return;
+	i = 0;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	i += 2;
 	while (line[i] == ' ' || line[i] == '\t')
 		i++;
 	if (is_texture_line(line, "NO "))
@@ -89,7 +117,10 @@ void	assign_color(t_rgb *color, char *line)
 
 	if (color->r != -1 || color->g != -1 || color->b != -1)
 		ft_error("Color duplicated", NULL, NULL);
-	i = 2;
+	i = 0;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	i++;
 	while (line[i] == ' ' || line[i] == '\t')
 		i++;
 	if (!line[i] || line[i] == '\n')
@@ -104,21 +135,33 @@ void	assign_color(t_rgb *color, char *line)
 	}
 	if (comma_count != 2)
 		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
 	if (!ft_isdigit(line[i]))
 		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->r = ft_atoi(&line[i]);
-	while (line[i] && line[i] != ',')
+	while (line[i] && ft_isdigit(line[i]))
 		i++;
-	if (line[i] == ',')
+	while (line[i] == ' ' || line[i] == '\t')
 		i++;
-	if (!line[i] || !ft_isdigit(line[i]))
+	if (line[i] != ',')
+		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
+	i++;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	if (!ft_isdigit(line[i]))
 		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->g = ft_atoi(&line[i]);
-	while (line[i] && line[i] != ',')
+	while (line[i] && ft_isdigit(line[i]))
 		i++;
-	if (line[i] == ',')
+	while (line[i] == ' ' || line[i] == '\t')
 		i++;
-	if (!line[i] || !ft_isdigit(line[i]))
+	if (line[i] != ',')
+		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
+	i++;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	if (!ft_isdigit(line[i]))
 		ft_error("Invalid color format. Expected: R,G,B", NULL, NULL);
 	color->b = ft_atoi(&line[i]);
 	if (color->r < 0 || color->r > 255

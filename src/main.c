@@ -34,6 +34,22 @@ int	validate_file_extension(char *filename)
 	return (1);
 }
 
+int	is_whitespace_only(const char *line)
+{
+	int	i;
+
+	if (!line)
+		return (1);
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n' && line[i] != '\r')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 void	validate_textures(t_cub3d *cub)
 {
 	if (!cub->textures.no || !cub->textures.so || !cub->textures.we || !cub->textures.ea
@@ -60,7 +76,7 @@ void	read_map(int fd, t_cub3d *cub)
 		if (c == '\n')
 		{
 			line[len] = '\0';
-			if (line[0] != '\0')
+			if (line[0] != '\0' && !is_whitespace_only(line))
 			{
 				if (is_texture_line(line, "NO ")
 					|| is_texture_line(line, "SO ")
