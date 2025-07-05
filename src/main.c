@@ -19,6 +19,7 @@
 #include "../includes/parse_map.h"
 #include "../includes/debug.h"
 #include "../includes/map_utils.h"
+#include "../includes/validate_map.h"
 #include "../includes/utils.h"
 
 int	validate_file_extension(char *filename)
@@ -120,6 +121,7 @@ int	main(int argc, char *argv[])
 	close(fd);
 	validate_textures(&cub);
 	assign_map(&cub, argv[1]);
+	validate_map(&cub);
 	print_map_debug(&cub);
 	free_textures(&cub.textures);
 	if (cub.map)

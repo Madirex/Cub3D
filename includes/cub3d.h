@@ -39,6 +39,9 @@ typedef struct s_cub3d
 	char		**map;
 	int			map_width;
 	int			map_height;
+	int			player_x;
+	int			player_y;
+	char		player_dir;
 }	t_cub3d;
 
 #endif
