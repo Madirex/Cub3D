@@ -11,10 +11,11 @@ SRC_FILES   = main \
 			  parsing/parse_textures  \
 			  parsing/parse_map \
 			  parsing/parse_player \
-			  parsing/validate_map \
 			  debug/debug_print \
+			  validations/validate_map \
+			  validations/validation_utils \
+			  loader/map_loader \
 			  utils/utils \
-			  utils/validation_utils \
 			  utils/assign_utils \
 			  utils/map_utils
 
