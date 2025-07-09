@@ -65,3 +65,26 @@ int	is_color_line(const char *line, char id)
 		i++;
 	return (line[i] == id && (line[i + 1] == ' ' || line[i + 1] == '\t'));
 }
+
+int	validate_file_extension(char *filename)
+{
+	int	len;
+
+	len = ft_strlen(filename);
+	if (len < 4)
+		return (0);
+	if (ft_strncmp(filename + len - 4, ".cub", 4) != 0)
+		return (0);
+	return (1);
+}
+
+void	validate_textures(t_cub3d *cub)
+{
+	if (!cub->textures.no || !cub->textures.so || !cub->textures.we
+		|| !cub->textures.ea || cub->textures.floor.r == -1
+		|| cub->textures.floor.g == -1 || cub->textures.floor.b == -1
+		|| cub->textures.ceiling.r == -1
+		|| cub->textures.ceiling.g == -1
+		|| cub->textures.ceiling.b == -1)
+		ft_error("Missing required fields in .cub file", cub, NULL);
+}
