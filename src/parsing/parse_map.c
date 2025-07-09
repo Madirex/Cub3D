@@ -19,6 +19,46 @@
 #include "../../includes/map_utils.h"
 #include "../../includes/utils.h"
 
+static char *resize_line_buffer(char *line, int *cap, int len)
+{
+	*cap *= 2;
+	char *tmp = (char *)malloc(*cap);
+	if (!tmp)
+	{
+		free(line);
+		return NULL;
+	}
+	ft_memcpy(tmp, line, len);
+	free(line);
+	return tmp;
+}
+
+static int read_char(int fd, char *c)
+{
+	return read(fd, c, 1);
+}
+
+static int is_line_end(char c)
+{
+	return (c == '\n');
+}
+
+static int is_carriage_return(char c)
+{
+	return (c == '\r');
+}
+
+static char *finalize_line(char *line, int n, int len)
+{
+	line[len] = '\0';
+	if (n == 0 && len == 0)
+	{
+		free(line);
+		return NULL;
+	}
+	return line;
+}
+
 static char	*read_line(int fd)
 {
 	char	*line;
@@ -32,38 +72,24 @@ static char	*read_line(int fd)
 	line = (char *)malloc(cap);
 	if (!line)
 		return (NULL);
-	while ((n = read(fd, &c, 1)) > 0)
+	while ((n = read_char(fd, &c)) > 0)
 	{
-		if (c == '\n')
+		if (is_line_end(c))
 			break;
-		if (c == '\r')
+		if (is_carriage_return(c))
 			continue;
 		line[len++] = c;
 		if (len + 1 >= cap)
 		{
-			cap *= 2;
-			char *tmp = (char *)malloc(cap);
-			if (!tmp)
-			{
-				free(line);
-				return (NULL);
-			}
-			ft_memcpy(tmp, line, len);
-			free(line);
-			line = tmp;
+			line = resize_line_buffer(line, &cap, len);
+			if (!line)
+				return NULL;
 		}
 	}
-	line[len] = '\0';
-	if (n == 0 && len == 0)
-	{
-		free(line);
-		return (NULL);
-	}
-	return (line);
+	return finalize_line(line, n, len);
 }
 
-static void handle_map_line(t_cub3d *cub, char ***temp_map,
-			int *map_lines, int *map_capacity, char *line)
+static void expand_temp_map_if_needed(t_cub3d *cub, char ***temp_map, int *map_lines, int *map_capacity, char *line)
 {
 	if (*map_lines >= *map_capacity)
 	{
@@ -83,15 +109,33 @@ static void handle_map_line(t_cub3d *cub, char ***temp_map,
 		free(*temp_map);
 		*temp_map = new_temp;
 	}
+}
+
+static char *trim_map_line_or_exit(t_cub3d *cub, char **temp_map, int map_lines, char *line)
+{
 	char *trimmed_line = ft_strtrim(line, " \t\n\r");
 	if (!trimmed_line)
 	{
-		free_map(*temp_map, *map_lines);
+		free_map(temp_map, map_lines);
 		ft_error("Memory allocation failed for map line trimming", cub, line);
 	}
+	return trimmed_line;
+}
+
+static void update_map_width(t_cub3d *cub, const char *trimmed_line)
+{
+	int len = (int)ft_strlen(trimmed_line);
+	if (len > cub->map_width)
+		cub->map_width = len;
+}
+
+static void handle_map_line(t_cub3d *cub, char ***temp_map,
+		int *map_lines, int *map_capacity, char *line)
+{
+	expand_temp_map_if_needed(cub, temp_map, map_lines, map_capacity, line);
+	char *trimmed_line = trim_map_line_or_exit(cub, *temp_map, *map_lines, line);
 	(*temp_map)[*map_lines] = trimmed_line;
-	if ((int)ft_strlen(trimmed_line) > cub->map_width)
-		cub->map_width = ft_strlen(trimmed_line);
+	update_map_width(cub, trimmed_line);
 	(*map_lines)++;
 }
 
@@ -125,41 +169,56 @@ static void	check_no_content_after_map(t_cub3d *cub,
 	free(line);
 }
 
-void	assign_map(t_cub3d *cub, char *filename)
+static void	init_map_vars(t_cub3d *cub, char ***temp_map, int *map_capacity, int *map_lines)
 {
-	int		map_capacity;
-	int		map_lines;
-	int		reading_map;
-	char	 **temp_map;
-	int		fd;
-	char	*line;
-
-	map_lines = 0;
-	reading_map = 0;
+	*map_lines = 0;
 	cub->map_width = 0;
-	map_capacity = 5;
-	temp_map = (char **)malloc(sizeof(char *) * map_capacity);
-	if (!temp_map)
+	*map_capacity = 5;
+	*temp_map = (char **)malloc(sizeof(char *) * (*map_capacity));
+	if (!*temp_map)
 		ft_error("Memory allocation failed for map", cub, NULL);
-	fd = open(filename, O_RDONLY);
+}
+
+static int	open_map_file(const char *filename, t_cub3d *cub)
+{
+	int fd = open(filename, O_RDONLY);
 	if (fd < 0)
 		ft_error("File could not be opened", cub, NULL);
+	return fd;
+}
+
+static void	process_map_lines(t_cub3d *cub, int fd, char ***temp_map, int *map_lines, int *map_capacity)
+{
+	int reading_map = 0;
+	char *line;
 	while ((line = read_line(fd)) != NULL)
 	{
 		if (reading_map && is_whitespace_only(line))
 		{
-			check_no_content_after_map(cub, fd, temp_map, map_lines, line);
-			break ;
+			check_no_content_after_map(cub, fd, *temp_map, *map_lines, line);
+			break;
 		}
 		if (is_map_line(line))
 		{
 			reading_map = 1;
-			handle_map_line(cub, &temp_map, &map_lines, &map_capacity, line);
+			handle_map_line(cub, temp_map, map_lines, map_capacity, line);
 		}
 		else if (reading_map && !is_whitespace_only(line))
 			ft_error("Invalid character found in map", cub, line);
 		free(line);
 	}
+}
+
+void	assign_map(t_cub3d *cub, char *filename)
+{
+	int map_capacity;
+	int map_lines;
+	char **temp_map;
+	int fd;
+
+	init_map_vars(cub, &temp_map, &map_capacity, &map_lines);
+	fd = open_map_file(filename, cub);
+	process_map_lines(cub, fd, &temp_map, &map_lines, &map_capacity);
 	close(fd);
 	finalize_map(cub, temp_map, map_lines);
 }
