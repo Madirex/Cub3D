@@ -19,7 +19,6 @@
 #include "../../includes/parse_map.h"
 
 void	assign_texture(t_cub3d *cub, char *line);
-int		is_whitespace_only(const char *line);
 void	validate_textures(t_cub3d *cub);
 
 static void	process_texture_or_color_line(t_cub3d *cub, char *line)

@@ -17,5 +17,6 @@
 
 void	free_textures(t_textures *textures);
 void	free_map(char **map, int height);
+int		is_map_line(const char *line);
 
 #endif

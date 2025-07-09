@@ -19,48 +19,6 @@
 #include "../../includes/map_utils.h"
 #include "../../includes/utils.h"
 
-int	is_valid_map_char(char c)
-{
-	return (c == '0' || c == '1' || c == 'N' || c == 'S' || 
-			c == 'E' || c == 'W' || c == ' ' || c == '\t');
-}
-
-int	is_empty_or_whitespace(const char *line)
-{
-	int	i;
-
-	if (!line)
-		return (1);
-	i = 0;
-	while (line[i])
-	{
-		if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n' && line[i] != '\r')
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-int	is_map_line(const char *line)
-{
-	int	i;
-	int	has_valid_char;
-
-	if (!line || !*line)
-		return (0);
-	i = 0;
-	has_valid_char = 0;
-	while (line[i])
-	{
-		if (!is_valid_map_char(line[i]) && line[i] != '\n')
-			return (0);
-		if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n')
-			has_valid_char = 1;
-		i++;
-	}
-	return (has_valid_char);
-}
-
 static char	*read_line(int fd)
 {
 	char	*line;
@@ -152,7 +110,7 @@ static void check_no_content_after_map(t_cub3d *cub, int fd, char **temp_map, in
     char *next_line;
     while ((next_line = read_line(fd)) != NULL)
     {
-        if (!is_empty_or_whitespace(next_line))
+        if (!is_whitespace_only(next_line))
         {
             free(line);
             free(next_line);
@@ -187,7 +145,7 @@ void assign_map(t_cub3d *cub, char *filename)
     
     while ((line = read_line(fd)) != NULL)
     {
-        if (reading_map && is_empty_or_whitespace(line))
+        if (reading_map && is_whitespace_only(line))
         {
             check_no_content_after_map(cub, fd, temp_map, map_lines, line);
             break ;
@@ -197,7 +155,7 @@ void assign_map(t_cub3d *cub, char *filename)
             reading_map = 1;
             handle_map_line(cub, &temp_map, &map_lines, &map_capacity, line);
         }
-        else if (reading_map && !is_empty_or_whitespace(line))
+        else if (reading_map && !is_whitespace_only(line))
             ft_error("Invalid character found in map", cub, line);
         free(line);
     }

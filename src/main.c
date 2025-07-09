@@ -26,7 +26,6 @@ void	assign_texture(t_cub3d *cub, char *line);
 int		validate_file_extension(char *filename);
 void	validate_textures(t_cub3d *cub);
 void	init_cub3d(t_cub3d *cub);
-int		is_whitespace_only(const char *line);
 void	read_map(int fd, t_cub3d *cub);
 
 int	main(int argc, char *argv[])

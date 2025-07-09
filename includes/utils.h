@@ -16,5 +16,6 @@
 # include "cub3d.h"
 
 void	ft_error(char *message, t_cub3d *cub, char *line);
+int		is_whitespace_only(const char *line);
 
 #endif
