@@ -47,11 +47,11 @@ typedef struct s_cub3d
 typedef struct s_readmap_ctx
 {
 	char	*line;
-	int	cap;
-	int	len;
+	int		cap;
+	int		len;
 	char	c;
-	int	n;
-	int	stop;
-} t_readmap_ctx;
+	int		n;
+	int		stop;
+}	t_readmap_ctx;
 
 #endif
