@@ -14,6 +14,8 @@ SRC_FILES   = main \
 			  parsing/validate_map \
 			  debug/debug_print \
 			  utils/utils \
+			  utils/validation_utils \
+			  utils/assign_utils \
 			  utils/map_utils
 
 

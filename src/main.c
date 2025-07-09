@@ -22,6 +22,8 @@
 #include "../includes/validate_map.h"
 #include "../includes/utils.h"
 
+void	assign_texture(t_cub3d *cub, char *line);
+
 int	validate_file_extension(char *filename)
 {
 	int	len;
@@ -82,9 +84,7 @@ void	read_map(int fd, t_cub3d *cub)
 					|| is_texture_line(line, "SO ")
 					|| is_texture_line(line, "WE ")
 					|| is_texture_line(line, "EA "))
-				{
 					assign_texture(cub, line);
-				}
 				else if (is_color_line(line, 'F'))
 					assign_color(&cub->textures.floor, line);
 				else if (is_color_line(line, 'C'))
