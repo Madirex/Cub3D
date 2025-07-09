@@ -147,13 +147,32 @@ static void finalize_map(t_cub3d *cub, char **temp_map, int map_lines)
     cub->map_height = map_lines;
 }
 
+static void check_no_content_after_map(t_cub3d *cub, int fd, char **temp_map, int map_lines, char *line)
+{
+    char *next_line;
+    while ((next_line = read_line(fd)) != NULL)
+    {
+        if (!is_empty_or_whitespace(next_line))
+        {
+            free(line);
+            free(next_line);
+            free_map(temp_map, map_lines);
+            ft_error("Content found after map ended. Map must be continuous.", cub, NULL);
+        }
+        free(next_line);
+    }
+    free(line);
+}
+
 void assign_map(t_cub3d *cub, char *filename)
 {
     int map_capacity;
     int map_lines;
     int reading_map;
     char **temp_map;
-
+	int fd;
+	char *line;
+	
     map_lines = 0;
     reading_map = 0;
     cub->map_width = 0;
@@ -161,29 +180,16 @@ void assign_map(t_cub3d *cub, char *filename)
     temp_map = (char **)malloc(sizeof(char *) * map_capacity);
     if (!temp_map)
         ft_error("Memory allocation failed for map", cub, NULL);
-
-    int fd = open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
         ft_error("File could not be opened", cub, NULL);
 
-    char *line;
+    
     while ((line = read_line(fd)) != NULL)
     {
         if (reading_map && is_empty_or_whitespace(line))
         {
-            char *next_line;
-            while ((next_line = read_line(fd)) != NULL)
-            {
-                if (!is_empty_or_whitespace(next_line))
-                {
-                    free(line);
-                    free(next_line);
-                    free_map(temp_map, map_lines);
-                    ft_error("Content found after map ended. Map must be continuous.", cub, NULL);
-                }
-                free(next_line);
-            }
-            free(line);
+            check_no_content_after_map(cub, fd, temp_map, map_lines, line);
             break ;
         }
         if (is_map_line(line))
