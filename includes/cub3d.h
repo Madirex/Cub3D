@@ -44,4 +44,14 @@ typedef struct s_cub3d
 	char		player_dir;
 }	t_cub3d;
 
+typedef struct s_readmap_ctx
+{
+	char	*line;
+	int	cap;
+	int	len;
+	char	c;
+	int	n;
+	int	stop;
+} t_readmap_ctx;
+
 #endif
