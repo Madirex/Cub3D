@@ -8,6 +8,7 @@ CFLAGS      = -Wall -Werror -Wextra -g
 LIBFT_PATH  = $(LIB_DIR)libft/libft.a
 
 SRC_FILES   = main \
+			  parsing/read_line \
 			  parsing/parse_textures  \
 			  parsing/parse_map \
 			  parsing/parse_player \
