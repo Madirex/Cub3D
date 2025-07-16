@@ -9,6 +9,7 @@ LIBFT_PATH  = $(LIB_DIR)libft/libft.a
 
 SRC_FILES   = main \
 			  parsing/read_line \
+			  parsing/process_map_lines \
 			  parsing/parse_textures  \
 			  parsing/parse_map \
 			  parsing/parse_player \
