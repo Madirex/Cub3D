@@ -46,6 +46,16 @@ static char	*finalize_line(char *line, int n, int len)
 	return (line);
 }
 
+static int	init_line_buffer(char **line, int *cap, int *len)
+{
+	*cap = 128;
+	*len = 0;
+	*line = (char *)malloc(*cap);
+	if (!*line)
+		return (0);
+	return (1);
+}
+
 static char	*read_line(int fd)
 {
 	char	*line;
@@ -54,10 +64,7 @@ static char	*read_line(int fd)
 	int		cap;
 	int		n;
 
-	cap = 128;
-	len = 0;
-	line = (char *)malloc(cap);
-	if (!line)
+	if (!init_line_buffer(&line, &cap, &len))
 		return (NULL);
 	n = read(fd, &c, 1);
 	while (n > 0)
