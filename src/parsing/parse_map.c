@@ -59,7 +59,8 @@ static char	*read_line(int fd)
 	line = (char *)malloc(cap);
 	if (!line)
 		return (NULL);
-	while ((n = read(fd, &c, 1)) > 0)
+	n = read(fd, &c, 1);
+	while (n > 0)
 	{
 		if (c == '\n')
 			break ;
@@ -72,6 +73,7 @@ static char	*read_line(int fd)
 			if (!line)
 				return (NULL);
 		}
+		n = read(fd, &c, 1);
 	}
 	return (finalize_line(line, n, len));
 }
@@ -79,7 +81,8 @@ static char	*read_line(int fd)
 static void	expand_temp_map_if_needed(t_cub3d *cub,
 		char ***temp_map, int *map_lines, int *map_capacity, char *line)
 {
-	char **new_temp;
+	char	**new_temp;
+	int		i;
 
 	if (*map_lines >= *map_capacity)
 	{
@@ -90,7 +93,7 @@ static void	expand_temp_map_if_needed(t_cub3d *cub,
 			free_map(*temp_map, *map_lines);
 			ft_error("Memory allocation failed for map expansion", cub, line);
 		}
-		int i = 0;
+		i = 0;
 		while (i < *map_lines)
 		{
 			new_temp[i] = (*temp_map)[i];
@@ -153,7 +156,8 @@ static void	check_no_content_after_map(t_cub3d *cub,
 {
 	char	*next_line;
 
-	while ((next_line = read_line(fd)) != NULL)
+	next_line = read_line(fd);
+	while (next_line != NULL)
 	{
 		if (!is_whitespace_only(next_line))
 		{
@@ -166,6 +170,7 @@ static void	check_no_content_after_map(t_cub3d *cub,
 				NULL);
 		}
 		free(next_line);
+		next_line = read_line(fd);
 	}
 	free(line);
 }
@@ -198,7 +203,8 @@ static void	process_map_lines(t_cub3d *cub, int fd,
 	char	*line;
 
 	reading_map = 0;
-	while ((line = read_line(fd)) != NULL)
+	line = read_line(fd);
+	while (line != NULL)
 	{
 		if (reading_map && is_whitespace_only(line))
 		{
@@ -213,6 +219,7 @@ static void	process_map_lines(t_cub3d *cub, int fd,
 		else if (reading_map && !is_whitespace_only(line))
 			ft_error("Invalid character found in map", cub, line);
 		free(line);
+		line = read_line(fd);
 	}
 }
 
