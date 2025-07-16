@@ -78,41 +78,41 @@ static char	*read_line(int fd)
 	return (finalize_line(line, n, len));
 }
 
-static void	expand_temp_map_if_needed(t_cub3d *cub,
-		char ***temp_map, int *map_lines, int *map_capacity, char *line)
+static void	expand_temp_map_if_needed(
+		t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
 {
 	char	**new_temp;
 	int		i;
 
-	if (*map_lines >= *map_capacity)
+	if (ctx->map_lines >= ctx->map_capacity)
 	{
-		*map_capacity *= 2;
-		new_temp = (char **)malloc(sizeof(char *) * (*map_capacity));
+		ctx->map_capacity *= 2;
+		new_temp = (char **)malloc(sizeof(char *) * (ctx->map_capacity));
 		if (!new_temp)
 		{
-			free_map(*temp_map, *map_lines);
+			free_map(ctx->temp_map, ctx->map_lines);
 			ft_error("Memory allocation failed for map expansion", cub, line);
 		}
 		i = 0;
-		while (i < *map_lines)
+		while (i < ctx->map_lines)
 		{
-			new_temp[i] = (*temp_map)[i];
+			new_temp[i] = ctx->temp_map[i];
 			i++;
 		}
-		free(*temp_map);
-		*temp_map = new_temp;
+		free(ctx->temp_map);
+		ctx->temp_map = new_temp;
 	}
 }
 
-static char	*trim_map_line_or_exit(t_cub3d *cub,
-		char **temp_map, int map_lines, char *line)
+static char	*trim_map_line_or_exit(
+		t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
 {
 	char	*trimmed_line;
 
 	trimmed_line = ft_strtrim(line, " \t\n\r");
 	if (!trimmed_line)
 	{
-		free_map(temp_map, map_lines);
+		free_map(ctx->temp_map, ctx->map_lines);
 		ft_error("Memory allocation failed for map line trimming", cub, line);
 	}
 	return (trimmed_line);
@@ -127,32 +127,30 @@ static void	update_map_width(t_cub3d *cub, const char *trimmed_line)
 		cub->map_width = len;
 }
 
-static void	handle_map_line(t_cub3d *cub, char ***temp_map,
-		int *map_lines, int *map_capacity, char *line)
+static void	handle_map_line(t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
 {
 	char	*trimmed_line;
 
-	expand_temp_map_if_needed(cub, temp_map, map_lines, map_capacity, line);
-	trimmed_line = trim_map_line_or_exit(cub,
-			*temp_map, *map_lines, line);
-	(*temp_map)[*map_lines] = trimmed_line;
+	expand_temp_map_if_needed(cub, ctx, line);
+	trimmed_line = trim_map_line_or_exit(cub, ctx, line);
+	ctx->temp_map[ctx->map_lines] = trimmed_line;
 	update_map_width(cub, trimmed_line);
-	(*map_lines)++;
+	ctx->map_lines++;
 }
 
-static void	finalize_map(t_cub3d *cub, char **temp_map, int map_lines)
+static void	finalize_map(t_cub3d *cub, t_map_parse_ctx *ctx)
 {
-	if (map_lines == 0)
+	if (ctx->map_lines == 0)
 	{
-		free(temp_map);
+		free(ctx->temp_map);
 		ft_error("No valid map found in the file", cub, NULL);
 	}
-	cub->map = temp_map;
-	cub->map_height = map_lines;
+	cub->map = ctx->temp_map;
+	cub->map_height = ctx->map_lines;
 }
 
-static void	check_no_content_after_map(t_cub3d *cub,
-				int fd, char **temp_map, int map_lines, char *line)
+static void	check_no_content_after_map(
+			t_cub3d *cub, int fd, t_map_parse_ctx *ctx, char *line)
 {
 	char	*next_line;
 
@@ -163,7 +161,7 @@ static void	check_no_content_after_map(t_cub3d *cub,
 		{
 			free(line);
 			free(next_line);
-			free_map(temp_map, map_lines);
+			free_map(ctx->temp_map, ctx->map_lines);
 			ft_error(
 				"Content found after map ended. Map must be continuous.",
 				cub,
@@ -175,14 +173,13 @@ static void	check_no_content_after_map(t_cub3d *cub,
 	free(line);
 }
 
-static void	init_map_vars(t_cub3d *cub, char ***temp_map,
-		int *map_capacity, int *map_lines)
+static void	init_map_vars(t_cub3d *cub, t_map_parse_ctx *ctx)
 {
-	*map_lines = 0;
+	ctx->map_lines = 0;
 	cub->map_width = 0;
-	*map_capacity = 5;
-	*temp_map = (char **)malloc(sizeof(char *) * (*map_capacity));
-	if (!*temp_map)
+	ctx->map_capacity = 5;
+	ctx->temp_map = (char **)malloc(sizeof(char *) * (ctx->map_capacity));
+	if (!ctx->temp_map)
 		ft_error("Memory allocation failed for map", cub, NULL);
 }
 
@@ -196,8 +193,7 @@ static int	open_map_file(const char *filename, t_cub3d *cub)
 	return (fd);
 }
 
-static void	process_map_lines(t_cub3d *cub, int fd,
-		char ***temp_map, int *map_lines, int *map_capacity)
+static void	process_map_lines(t_cub3d *cub, int fd, t_map_parse_ctx *ctx)
 {
 	int		reading_map;
 	char	*line;
@@ -208,13 +204,13 @@ static void	process_map_lines(t_cub3d *cub, int fd,
 	{
 		if (reading_map && is_whitespace_only(line))
 		{
-			check_no_content_after_map(cub, fd, *temp_map, *map_lines, line);
+			check_no_content_after_map(cub, fd, ctx, line);
 			break ;
 		}
 		if (is_map_line(line))
 		{
 			reading_map = 1;
-			handle_map_line(cub, temp_map, map_lines, map_capacity, line);
+			handle_map_line(cub, ctx, line);
 		}
 		else if (reading_map && !is_whitespace_only(line))
 			ft_error("Invalid character found in map", cub, line);
@@ -225,14 +221,12 @@ static void	process_map_lines(t_cub3d *cub, int fd,
 
 void	assign_map(t_cub3d *cub, char *filename)
 {
-	int		map_capacity;
-	int		map_lines;
-	char	**temp_map;
-	int		fd;
+	t_map_parse_ctx	ctx;
+	int				fd;
 
-	init_map_vars(cub, &temp_map, &map_capacity, &map_lines);
+	init_map_vars(cub, &ctx);
 	fd = open_map_file(filename, cub);
-	process_map_lines(cub, fd, &temp_map, &map_lines, &map_capacity);
+	process_map_lines(cub, fd, &ctx);
 	close(fd);
-	finalize_map(cub, temp_map, map_lines);
+	finalize_map(cub, &ctx);
 }

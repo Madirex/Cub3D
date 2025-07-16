@@ -18,4 +18,11 @@
 void	assign_map(t_cub3d *cub, char *filename);
 int		is_map_line(const char *line);
 
+typedef struct s_map_parse_ctx
+{
+	char	**temp_map;
+	int		map_lines;
+	int		map_capacity;
+}	t_map_parse_ctx;
+
 #endif
