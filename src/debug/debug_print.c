@@ -10,9 +10,25 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file debug_print.c
+ * @brief Debug printing functions for the Cub3D project
+ * 
+ * This file contains functions for printing debug information
+ * about textures and maps during development and testing.
+ */
+
 #include <stdio.h>
 #include "../../includes/cub3d.h"
 
+/**
+ * @brief Prints all texture information for debugging purposes
+ * 
+ * Displays the paths of all loaded textures (NO, SO, WE, EA)
+ * and the RGB values for floor and ceiling colors.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ */
 void	print_textures_debug(t_cub3d *cub)
 {
 	printf("[Debug] Textures:\n");
@@ -32,6 +48,14 @@ void	print_textures_debug(t_cub3d *cub)
 			cub->textures.ceiling.g, cub->textures.ceiling.b);
 }
 
+/**
+ * @brief Prints the parsed map for debugging purposes
+ * 
+ * Displays the map dimensions and each line of the map
+ * with line numbers for easy debugging.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ */
 void	print_map_debug(t_cub3d *cub)
 {
 	int	i;

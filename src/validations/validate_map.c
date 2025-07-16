@@ -10,17 +10,44 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file validate_map.c
+ * @brief Map validation functions for the Cub3D project
+ * 
+ * This file contains functions for validating map structure,
+ * including flood fill algorithm to ensure proper wall enclosure.
+ */
+
 #include "../../includes/cub3d.h"
 #include "../../includes/utils.h"
 
 void	find_player_position(t_cub3d *cub);
 
+/**
+ * @brief Checks if a position is at the border of the map
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param x X coordinate to check
+ * @param y Y coordinate to check
+ * @return 1 if position is at border, 0 otherwise
+ */
 static int	is_border_position(t_cub3d *cub, int x, int y)
 {
 	return (y == 0 || y == cub->map_height - 1
 		|| x == 0 || x >= (int)ft_strlen(cub->map[y]) - 1);
 }
 
+/**
+ * @brief Recursive flood fill algorithm to validate map enclosure
+ * 
+ * Uses flood fill to check that all accessible areas are properly
+ * enclosed by walls, ensuring no open borders exist.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param visited 2D array tracking visited positions
+ * @param x Current X coordinate
+ * @param y Current Y coordinate
+ */
 static void	flood_fill(t_cub3d *cub, int **visited, int x, int y)
 {
 	if (y < 0 || y >= cub->map_height || x < 0)
@@ -44,6 +71,15 @@ static void	flood_fill(t_cub3d *cub, int **visited, int x, int y)
 	flood_fill(cub, visited, x, y - 1);
 }
 
+/**
+ * @brief Handles memory allocation failure for visited array
+ * 
+ * Cleans up partially allocated visited array and exits with error.
+ * 
+ * @param visited Partially allocated visited array
+ * @param i Number of successfully allocated rows
+ * @param cub Pointer to the main Cub3D structure
+ */
 static void	handle_visited_allocation_failure(
 				int **visited, int i, t_cub3d *cub)
 {
@@ -53,6 +89,14 @@ static void	handle_visited_allocation_failure(
 	ft_error("Memory allocation failed for map validation", cub, NULL);
 }
 
+/**
+ * @brief Main function to validate the parsed map
+ * 
+ * Validates that the map exists, finds the player position,
+ * and uses flood fill to ensure the map is properly enclosed by walls.
+ * 
+ * @param cub Pointer to the main Cub3D structure containing the map
+ */
 void	validate_map(t_cub3d *cub)
 {
 	int	**visited;

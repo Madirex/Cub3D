@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file map_utils.h
+ * @brief Map utility functions for the Cub3D project
+ * 
+ * This header contains utility functions for map handling,
+ * including memory management and map line validation.
+ */
+
 #ifndef MAP_UTILS_H
 # define MAP_UTILS_H
 

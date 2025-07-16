@@ -1,3 +1,11 @@
+/**
+ * @file process_map_lines.c
+ * @brief Map line processing functions for the Cub3D project
+ * 
+ * This file contains functions for processing individual map lines,
+ * including memory management and validation during map parsing.
+ */
+
 #include <stdlib.h>
 #include <unistd.h>
 #include "../../includes/cub3d.h"
@@ -7,6 +15,16 @@
 
 char	*read_line(int fd);
 
+/**
+ * @brief Expands the temporary map array if needed
+ * 
+ * Doubles the capacity of the temporary map array when
+ * the current capacity is exceeded.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param ctx Pointer to the map parsing context
+ * @param line Current line being processed (for error handling)
+ */
 static void	expand_temp_map_if_needed(
 		t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
 {
@@ -33,6 +51,14 @@ static void	expand_temp_map_if_needed(
 	}
 }
 
+/**
+ * @brief Trims a map line or exits on memory allocation failure
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param ctx Pointer to the map parsing context
+ * @param line The line to trim
+ * @return Trimmed line or exits on failure
+ */
 static char	*trim_map_line_or_exit(
 		t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
 {
@@ -47,6 +73,16 @@ static char	*trim_map_line_or_exit(
 	return (trimmed_line);
 }
 
+/**
+ * @brief Handles processing of a single map line
+ * 
+ * Expands the map array if needed, trims the line, and
+ * updates the map width if necessary.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param ctx Pointer to the map parsing context
+ * @param line The map line to process
+ */
 static void	handle_map_line(t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
 {
 	char	*trimmed_line;
@@ -61,6 +97,17 @@ static void	handle_map_line(t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
 	ctx->map_lines++;
 }
 
+/**
+ * @brief Checks that no content exists after the map ends
+ * 
+ * Validates that the map is continuous and no non-whitespace
+ * content appears after the map section.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param fd File descriptor to read from
+ * @param ctx Pointer to the map parsing context
+ * @param line Current line being processed
+ */
 static void	check_no_content_after_map(
 			t_cub3d *cub, int fd, t_map_parse_ctx *ctx, char *line)
 {
@@ -85,6 +132,16 @@ static void	check_no_content_after_map(
 	free(line);
 }
 
+/**
+ * @brief Main function to process all map lines from a file
+ * 
+ * Reads lines from the file descriptor and processes them
+ * as map data, ensuring continuity and proper formatting.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param fd File descriptor to read from
+ * @param ctx Pointer to the map parsing context
+ */
 void	process_map_lines(t_cub3d *cub, int fd, t_map_parse_ctx *ctx)
 {
 	int		reading_map;

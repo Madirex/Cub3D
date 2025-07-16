@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file debug.h
+ * @brief Debug utilities for the Cub3D project
+ * 
+ * This header contains function declarations for debugging purposes,
+ * including functions to print texture and map information.
+ */
+
 #ifndef DEBUG_H
 # define DEBUG_H
 

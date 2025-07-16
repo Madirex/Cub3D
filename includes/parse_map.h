@@ -10,19 +10,30 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file parse_map.h
+ * @brief Map parsing functions for the Cub3D project
+ * 
+ * This header contains functions and structures for parsing
+ * map data from .cub files.
+ */
+
 #ifndef PARSE_MAP_H
 # define PARSE_MAP_H
 
 # include "cub3d.h"
 
-void	assign_map(t_cub3d *cub, char *filename);
-int		is_map_line(const char *line);
-
+/**
+ * @brief Context structure for map parsing operations
+ */
 typedef struct s_map_parse_ctx
 {
-	char	**temp_map;
-	int		map_lines;
-	int		map_capacity;
+	char	**temp_map;		/**< Temporary map storage during parsing */
+	int		map_lines;		/**< Number of map lines parsed */
+	int		map_capacity;	/**< Current capacity of temp_map array */
 }	t_map_parse_ctx;
+
+void	assign_map(t_cub3d *cub, char *filename);
+int		is_map_line(const char *line);
 
 #endif

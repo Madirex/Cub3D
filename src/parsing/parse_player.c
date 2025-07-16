@@ -10,14 +10,36 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file parse_player.c
+ * @brief Player parsing functions for the Cub3D project
+ * 
+ * This file contains functions for finding and validating
+ * the player's starting position and direction in the map.
+ */
+
 #include "../../includes/cub3d.h"
 #include "../../includes/utils.h"
 
+/**
+ * @brief Checks if a character represents a player
+ * 
+ * @param c Character to check
+ * @return 1 if character is N, S, E, or W, 0 otherwise
+ */
 static int	is_player_char(char c)
 {
 	return (c == 'N' || c == 'S' || c == 'E' || c == 'W');
 }
 
+/**
+ * @brief Finds the player's starting position and direction in the map
+ * 
+ * Scans the entire map to find exactly one player character
+ * and stores the position and direction in the Cub3D structure.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ */
 void	find_player_position(t_cub3d *cub)
 {
 	int	i;

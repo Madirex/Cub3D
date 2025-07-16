@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file parse_map.c
+ * @brief Map parsing functions for the Cub3D project
+ * 
+ * This file contains functions for parsing map data from .cub files,
+ * including initialization, processing, and finalization of map data.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -21,6 +29,15 @@
 
 void	process_map_lines(t_cub3d *cub, int fd, t_map_parse_ctx *ctx);
 
+/**
+ * @brief Initializes map parsing variables and allocates initial memory
+ * 
+ * Sets up the parsing context with initial values and allocates
+ * memory for the temporary map storage.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param ctx Pointer to the map parsing context
+ */
 static void	init_map_vars(t_cub3d *cub, t_map_parse_ctx *ctx)
 {
 	ctx->map_lines = 0;
@@ -31,6 +48,15 @@ static void	init_map_vars(t_cub3d *cub, t_map_parse_ctx *ctx)
 		ft_error("Memory allocation failed for map", cub, NULL);
 }
 
+/**
+ * @brief Finalizes map parsing and assigns the map to the main structure
+ * 
+ * Validates that a map was found and assigns the temporary map
+ * to the main Cub3D structure.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param ctx Pointer to the map parsing context
+ */
 static void	finalize_map(t_cub3d *cub, t_map_parse_ctx *ctx)
 {
 	if (ctx->map_lines == 0)
@@ -42,6 +68,15 @@ static void	finalize_map(t_cub3d *cub, t_map_parse_ctx *ctx)
 	cub->map_height = ctx->map_lines;
 }
 
+/**
+ * @brief Main function to assign map data from a .cub file
+ * 
+ * Opens the file, processes all map lines, and finalizes
+ * the map assignment to the Cub3D structure.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param filename Path to the .cub file
+ */
 void	assign_map(t_cub3d *cub, char *filename)
 {
 	t_map_parse_ctx	ctx;

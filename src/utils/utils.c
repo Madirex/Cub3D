@@ -10,11 +10,25 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file utils.c
+ * @brief General utility functions for the Cub3D project
+ * 
+ * This file contains general-purpose utility functions including
+ * error handling, initialization, and string validation.
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "../../includes/cub3d.h"
 #include "../../includes/map_utils.h"
 
+/**
+ * @brief Safely exits the program after cleaning up resources
+ * 
+ * @param cub Pointer to the main Cub3D structure (for cleanup)
+ * @param line Line to free if not NULL
+ */
 static void	safe_exit(t_cub3d *cub, char *line)
 {
 	if (cub)
@@ -28,6 +42,16 @@ static void	safe_exit(t_cub3d *cub, char *line)
 	exit(1);
 }
 
+/**
+ * @brief Handles errors by printing a message and cleaning up resources
+ * 
+ * Prints "Error" followed by the provided message, then safely
+ * exits the program after cleaning up allocated resources.
+ * 
+ * @param message Error message to display
+ * @param cub Pointer to the main Cub3D structure (for cleanup)
+ * @param line Line to free if not NULL
+ */
 void	ft_error(char *message, t_cub3d *cub, char *line)
 {
 	printf("Error\n");
@@ -36,6 +60,12 @@ void	ft_error(char *message, t_cub3d *cub, char *line)
 	safe_exit(cub, line);
 }
 
+/**
+ * @brief Checks if a line contains only whitespace characters
+ * 
+ * @param line The line to check
+ * @return 1 if line contains only whitespace or is NULL, 0 otherwise
+ */
 int	is_whitespace_only(const char *line)
 {
 	int	i;
@@ -53,6 +83,14 @@ int	is_whitespace_only(const char *line)
 	return (1);
 }
 
+/**
+ * @brief Initializes the main Cub3D structure with default values
+ * 
+ * Sets all fields to zero and initializes RGB color values to -1
+ * to indicate they haven't been set yet.
+ * 
+ * @param cub Pointer to the main Cub3D structure to initialize
+ */
 void	init_cub3d(t_cub3d *cub)
 {
 	ft_memset(cub, 0, sizeof(t_cub3d));

@@ -10,10 +10,26 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file validation_utils.c
+ * @brief Validation utility functions for the Cub3D project
+ * 
+ * This file contains utility functions for validating file extensions,
+ * texture files, and configuration line formats.
+ */
+
 #include <fcntl.h>
 #include <unistd.h>
 #include "../../includes/utils.h"
 
+/**
+ * @brief Validates that a texture file exists and has correct extension
+ * 
+ * Checks that the file has .xpm extension and can be opened for reading.
+ * 
+ * @param path Path to the texture file
+ * @return 1 if file is valid, 0 otherwise
+ */
 int	validate_texture_file(char *path)
 {
 	int	fd;
@@ -33,6 +49,16 @@ int	validate_texture_file(char *path)
 	return (1);
 }
 
+/**
+ * @brief Checks if a line contains texture information
+ * 
+ * Validates that the line starts with the specified texture identifier
+ * followed by whitespace.
+ * 
+ * @param line The line to check
+ * @param id The texture identifier (NO, SO, WE, EA)
+ * @return 1 if it's a texture line, 0 otherwise
+ */
 int	is_texture_line(const char *line, const char *id)
 {
 	int	i;
@@ -54,6 +80,16 @@ int	is_texture_line(const char *line, const char *id)
 	return (j == 2 && (line[i] == ' ' || line[i] == '\t'));
 }
 
+/**
+ * @brief Checks if a line contains color information
+ * 
+ * Validates that the line starts with the specified color identifier
+ * followed by whitespace.
+ * 
+ * @param line The line to check
+ * @param id The color identifier (F for floor, C for ceiling)
+ * @return 1 if it's a color line, 0 otherwise
+ */
 int	is_color_line(const char *line, char id)
 {
 	int	i;
@@ -66,6 +102,12 @@ int	is_color_line(const char *line, char id)
 	return (line[i] == id && (line[i + 1] == ' ' || line[i + 1] == '\t'));
 }
 
+/**
+ * @brief Validates that a filename has the correct .cub extension
+ * 
+ * @param filename The filename to validate
+ * @return 1 if filename has .cub extension, 0 otherwise
+ */
 int	validate_file_extension(char *filename)
 {
 	int	len;
@@ -78,6 +120,14 @@ int	validate_file_extension(char *filename)
 	return (1);
 }
 
+/**
+ * @brief Validates that all required textures and colors are defined
+ * 
+ * Checks that all four wall textures (NO, SO, WE, EA) and both
+ * colors (floor and ceiling) have been properly configured.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ */
 void	validate_textures(t_cub3d *cub)
 {
 	if (!cub->textures.no || !cub->textures.so || !cub->textures.we

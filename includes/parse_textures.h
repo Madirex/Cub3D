@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file parse_textures.h
+ * @brief Texture parsing functions for the Cub3D project
+ * 
+ * This header contains functions for parsing texture paths
+ * and color information from .cub files.
+ */
+
 #ifndef PARSE_TEXTURES_H
 # define PARSE_TEXTURES_H
 

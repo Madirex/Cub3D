@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file utils.h
+ * @brief General utility functions for the Cub3D project
+ * 
+ * This header contains general-purpose utility functions
+ * including error handling and string validation.
+ */
+
 #ifndef UTILS_H
 # define UTILS_H
 

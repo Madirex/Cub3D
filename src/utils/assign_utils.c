@@ -10,12 +10,30 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file assign_utils.c
+ * @brief Texture assignment utility functions for the Cub3D project
+ * 
+ * This file contains functions for assigning texture paths
+ * from parsed configuration lines with validation.
+ */
+
 #include "../../includes/cub3d.h"
 #include "../../includes/utils.h"
 #include "../../includes/parse_textures.h"
 
 int		validate_texture_file(char *path);
 
+/**
+ * @brief Sets a texture path after validation
+ * 
+ * Extracts the texture path from a line, trims whitespace,
+ * validates the file exists, and assigns it to the texture pointer.
+ * 
+ * @param texture Pointer to the texture string pointer
+ * @param line The line containing the texture path
+ * @param k Starting index in the line
+ */
 static void	set_texture(char **texture, char *line, int k)
 {
 	char	*path;
@@ -38,6 +56,15 @@ static void	set_texture(char **texture, char *line, int k)
 	*texture = trimmed_path;
 }
 
+/**
+ * @brief Assigns a texture based on the line identifier
+ * 
+ * Parses the line to identify which texture (NO, SO, WE, EA)
+ * is being defined and assigns the corresponding texture path.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param line The line containing texture information
+ */
 void	assign_texture(t_cub3d *cub, char *line)
 {
 	int	i;

@@ -10,17 +10,38 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file map_utils.c
+ * @brief Map utility functions for the Cub3D project
+ * 
+ * This file contains utility functions for map handling,
+ * including memory management and character validation.
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "../../includes/cub3d.h"
 #include "../../includes/map_utils.h"
 
+/**
+ * @brief Checks if a character is valid for map content
+ * 
+ * @param c Character to validate
+ * @return 1 if character is valid for maps, 0 otherwise
+ */
 static int	is_valid_map_char(char c)
 {
 	return (c == '0' || c == '1' || c == 'N' || c == 'S'
 		|| c == 'E' || c == 'W' || c == ' ' || c == '\t');
 }
 
+/**
+ * @brief Frees all allocated texture memory
+ * 
+ * Safely frees all texture path strings in the textures structure.
+ * 
+ * @param textures Pointer to the textures structure
+ */
 void	free_textures(t_textures *textures)
 {
 	if (textures->no)
@@ -33,6 +54,14 @@ void	free_textures(t_textures *textures)
 		free(textures->ea);
 }
 
+/**
+ * @brief Frees the allocated map memory
+ * 
+ * Frees each line of the map and then the map array itself.
+ * 
+ * @param map Double pointer to the map array
+ * @param height Height of the map (number of lines)
+ */
 void	free_map(char **map, int height)
 {
 	int	i;
@@ -49,6 +78,15 @@ void	free_map(char **map, int height)
 	free(map);
 }
 
+/**
+ * @brief Checks if a line contains valid map data
+ * 
+ * Validates that the line contains only valid map characters
+ * and has at least one non-whitespace character.
+ * 
+ * @param line The line to check
+ * @return 1 if it's a valid map line, 0 otherwise
+ */
 int	is_map_line(const char *line)
 {
 	int	i;

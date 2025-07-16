@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file main.c
+ * @brief Main entry point for the Cub3D project
+ * 
+ * This file contains the main function that orchestrates the parsing,
+ * validation, and initialization of the Cub3D raycasting engine.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -28,6 +36,16 @@ void	validate_textures(t_cub3d *cub);
 void	init_cub3d(t_cub3d *cub);
 void	read_map(int fd, t_cub3d *cub);
 
+/**
+ * @brief Main entry point of the Cub3D program
+ * 
+ * Handles command line arguments, file validation, parsing,
+ * and cleanup of resources.
+ * 
+ * @param argc Number of command line arguments
+ * @param argv Array of command line arguments
+ * @return 0 on success, 1 on error
+ */
 int	main(int argc, char *argv[])
 {
 	int		fd;

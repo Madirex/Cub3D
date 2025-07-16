@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file map_loader.c
+ * @brief Map loading and parsing functions for the Cub3D project
+ * 
+ * This file contains functions for reading and parsing .cub files,
+ * including texture and color configuration parsing.
+ */
+
 #include <stdlib.h>
 #include <unistd.h>
 #include "../../includes/parse_textures.h"
@@ -21,6 +29,15 @@
 void	assign_texture(t_cub3d *cub, char *line);
 void	validate_textures(t_cub3d *cub);
 
+/**
+ * @brief Processes a line containing texture or color configuration
+ * 
+ * Identifies and processes texture paths (NO, SO, WE, EA) and
+ * color values (F for floor, C for ceiling).
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param line The line to process
+ */
 static void	process_texture_or_color_line(t_cub3d *cub, char *line)
 {
 	if (is_texture_line(line, "NO ")
@@ -36,6 +53,16 @@ static void	process_texture_or_color_line(t_cub3d *cub, char *line)
 		ft_error("Invalid configuration line", cub, line);
 }
 
+/**
+ * @brief Checks if a line marks the start of the map section
+ * 
+ * Validates that all required configuration elements (textures and colors)
+ * are defined before the map section begins.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param line The line to check
+ * @return 1 if this line starts the map, 0 otherwise
+ */
 static int	check_map_start(t_cub3d *cub, char *line)
 {
 	if (is_map_line(line))
@@ -54,6 +81,15 @@ static int	check_map_start(t_cub3d *cub, char *line)
 	return (0);
 }
 
+/**
+ * @brief Handles the end of a line during file reading
+ * 
+ * Null-terminates the current line, processes it if it's not empty
+ * or whitespace-only, and resets the line buffer for the next line.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param ctx Pointer to the reading context
+ */
 static void	handle_line_end(t_cub3d *cub, t_readmap_ctx *ctx)
 {
 	ctx->line[ctx->len] = '\0';
@@ -68,6 +104,18 @@ static void	handle_line_end(t_cub3d *cub, t_readmap_ctx *ctx)
 	ctx->line[0] = '\0';
 }
 
+/**
+ * @brief Expands the line buffer when capacity is exceeded
+ * 
+ * Doubles the buffer capacity, allocates new memory, copies existing
+ * content, and frees the old buffer.
+ * 
+ * @param line Current line buffer
+ * @param cap Pointer to current capacity (will be doubled)
+ * @param len Current length of content in buffer
+ * @param cub Pointer to the main Cub3D structure (for error handling)
+ * @return New expanded buffer
+ */
 static char	*expand_line_buffer(char *line, int *cap, int len, t_cub3d *cub)
 {
 	char	*tmp;
@@ -81,6 +129,16 @@ static char	*expand_line_buffer(char *line, int *cap, int len, t_cub3d *cub)
 	return (tmp);
 }
 
+/**
+ * @brief Main function to read and parse a .cub file
+ * 
+ * Reads the file character by character, building lines and processing
+ * texture/color configuration until the map section is reached.
+ * Handles dynamic buffer expansion and validates textures after parsing.
+ * 
+ * @param fd File descriptor of the .cub file to read
+ * @param cub Pointer to the main Cub3D structure to populate
+ */
 void	read_map(int fd, t_cub3d *cub)
 {
 	t_readmap_ctx	ctx;

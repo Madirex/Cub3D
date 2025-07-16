@@ -1,7 +1,23 @@
+/**
+ * @file read_line.c
+ * @brief Line reading utility for the Cub3D project
+ * 
+ * This file contains functions for reading lines from file descriptors
+ * with dynamic memory allocation and proper buffer management.
+ */
+
 #include <stdlib.h>
 #include <unistd.h>
 #include "../../includes/utils.h"
 
+/**
+ * @brief Resizes the line buffer when capacity is exceeded
+ * 
+ * @param line Current line buffer
+ * @param cap Pointer to current capacity (updated)
+ * @param len Current length of the line
+ * @return New resized buffer or NULL on failure
+ */
 static char	*resize_line_buffer(char *line, int *cap, int len)
 {
 	char	*tmp;
@@ -18,6 +34,14 @@ static char	*resize_line_buffer(char *line, int *cap, int len)
 	return (tmp);
 }
 
+/**
+ * @brief Finalizes the line by null-terminating and handling EOF
+ * 
+ * @param line The line buffer to finalize
+ * @param n Number of bytes read (0 indicates EOF)
+ * @param len Current length of the line
+ * @return Finalized line or NULL if EOF with empty line
+ */
 static char	*finalize_line(char *line, int n, int len)
 {
 	line[len] = '\0';
@@ -29,6 +53,14 @@ static char	*finalize_line(char *line, int n, int len)
 	return (line);
 }
 
+/**
+ * @brief Initializes the line buffer with default capacity
+ * 
+ * @param line Pointer to line buffer pointer
+ * @param cap Pointer to capacity variable
+ * @param len Pointer to length variable
+ * @return 1 on success, 0 on failure
+ */
 static int	init_line_buffer(char **line, int *cap, int *len)
 {
 	*cap = 128;
@@ -39,6 +71,15 @@ static int	init_line_buffer(char **line, int *cap, int *len)
 	return (1);
 }
 
+/**
+ * @brief Reads a complete line from a file descriptor
+ * 
+ * Reads characters until a newline is encountered or EOF is reached.
+ * Dynamically allocates and resizes the buffer as needed.
+ * 
+ * @param fd File descriptor to read from
+ * @return Allocated string containing the line, or NULL on EOF/error
+ */
 char	*read_line(int fd)
 {
 	char	*line;

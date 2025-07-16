@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file validate_map.h
+ * @brief Map validation functions for the Cub3D project
+ * 
+ * This header contains functions for validating map structure
+ * and ensuring it meets the requirements for the raycasting engine.
+ */
+
 #ifndef VALIDATE_MAP_H
 # define VALIDATE_MAP_H
 

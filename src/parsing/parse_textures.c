@@ -10,6 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @file parse_textures.c
+ * @brief Texture and color parsing functions for the Cub3D project
+ * 
+ * This file contains functions for parsing RGB color values
+ * from .cub configuration files with proper validation.
+ */
+
 #include <fcntl.h>
 #include "../../includes/cub3d.h"
 #include "../../includes/utils.h"
@@ -17,6 +25,13 @@
 int		is_texture_line(const char *line, const char *id);
 int		is_color_line(const char *line, char id);
 
+/**
+ * @brief Skips whitespace characters in a line
+ * 
+ * @param line The line to process
+ * @param i Starting index
+ * @return Index after skipping whitespace
+ */
 static int	skip_spaces(const char *line, int i)
 {
 	while (line[i] == ' ' || line[i] == '\t')
@@ -24,6 +39,13 @@ static int	skip_spaces(const char *line, int i)
 	return (i);
 }
 
+/**
+ * @brief Counts the number of commas in a line starting from index i
+ * 
+ * @param line The line to process
+ * @param i Starting index
+ * @return Number of commas found
+ */
 static int	count_commas(const char *line, int i)
 {
 	int	count;
@@ -38,6 +60,13 @@ static int	count_commas(const char *line, int i)
 	return (count);
 }
 
+/**
+ * @brief Skips identifier and surrounding spaces
+ * 
+ * @param line The line to process
+ * @param i Starting index
+ * @return Index after skipping identifier and spaces
+ */
 static int	skip_id_and_spaces(const char *line, int i)
 {
 	i = skip_spaces(line, i);
@@ -46,6 +75,13 @@ static int	skip_id_and_spaces(const char *line, int i)
 	return (i);
 }
 
+/**
+ * @brief Parses a single RGB color component from a line
+ * 
+ * @param line The line containing the color value
+ * @param i Pointer to the current index (updated after parsing)
+ * @return The parsed color value
+ */
 static int	parse_color_component(const char *line, int *i)
 {
 	int	value;
@@ -59,6 +95,15 @@ static int	parse_color_component(const char *line, int *i)
 	return (value);
 }
 
+/**
+ * @brief Assigns RGB color values from a parsed line
+ * 
+ * Parses a line containing RGB values in format "R,G,B" and
+ * assigns them to the provided RGB structure with validation.
+ * 
+ * @param color Pointer to the RGB structure to fill
+ * @param line The line containing color information
+ */
 void	assign_color(t_rgb *color, char *line)
 {
 	int	i;
