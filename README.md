@@ -77,6 +77,6 @@ sudo apt-get install libx11-dev libxext-dev zlib1g-dev
 
 ## Authors
 
-- [Leroidubuffet](https://github.com/leroidubuffet/)
+- [Skyce11](https://github.com/skyce11/)
 - [Madirex](https://github.com/madirex/)
 
