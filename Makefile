@@ -19,7 +19,8 @@ SRC_FILES   = main \
 			  loader/map_loader \
 			  utils/utils \
 			  utils/assign_utils \
-			  utils/map_utils
+			  utils/map_utils \
+			  render/raycast
 
 
 OBJS        = $(addprefix $(OBJS_DIR), $(addsuffix .o, $(SRC_FILES)))

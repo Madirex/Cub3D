@@ -70,6 +70,22 @@ typedef struct s_cub3d
 	int			player_x;	/**< Player X position on map */
 	int			player_y;	/**< Player Y position on map */
 	char		player_dir;	/**< Player initial direction (N/S/E/W) */
+
+	// --- Añadidos para raycasting y MLX ---
+	double		pos_x;      // Posición real X (con decimales)
+	double		pos_y;      // Posición real Y
+	double		dir_x;      // Dirección del jugador X
+	double		dir_y;      // Dirección del jugador Y
+	double		plane_x;    // Plano de cámara X
+	double		plane_y;    // Plano de cámara Y
+
+	void		*mlx;       // Puntero a la instancia MLX
+	void		*win;       // Puntero a la ventana MLX
+	void		*img;       // Imagen para dibujar
+	char		*img_data;  // Buffer de datos de píxel de la imagen
+	int			bpp;        // Bits por píxel
+	int			size_line;  // Bytes por línea de la imagen
+	int			endian;     // Endianess de la imagen
 }	t_cub3d;
 
 /**
