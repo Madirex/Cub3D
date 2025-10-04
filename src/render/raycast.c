@@ -1,11 +1,13 @@
-#include "../../includes/cub3d.h"
+#include "../includes/cub3d.h"
 #include <mlx.h>
 #include <math.h>
+#include <string.h>
 
 #define WIDTH 640
 #define HEIGHT 480
 #define MOVE_SPEED 0.09
 #define ROT_SPEED 0.055
+#define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W')
 
 static int	get_color(char cell, int side)
 {
@@ -50,7 +52,7 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 			{	sideDistX += deltaDistX; mapX += stepX; side = 0; }
 			else
 			{	sideDistY += deltaDistY; mapY += stepY; side = 1; }
-			if (mapY < 0 || mapY >= cub->map_height || mapX < 0 || mapX >= cub->map_width)
+			if (mapY < 0 || mapY >= cub->map_height || mapX < 0 || mapX >= (int)strlen(cub->map[mapY]))
 				break;
 			char cell = cub->map[mapY][mapX];
 			if (cell && cell != '0' && cell != ' ')
@@ -70,7 +72,7 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 
 		int color = get_color(cub->map[mapY][mapX], side);
 
-		// Fondo (negro)
+		// Fondo (negro arriba, gris abajo)
 		for (int y = 0; y < drawStart; y++)
 			*(unsigned int *)(img_data + (y * size_line + x * (bpp/8))) = 0x202020;
 		for (int y = drawEnd+1; y < HEIGHT; y++)
@@ -81,37 +83,26 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 	}
 }
 
-// Para controles de movimiento (WASD y flechas, ESC para salir)
-int	handle_keys(int key, t_cub3d *cub)
+// Movimiento y rotación con WASD y flechas, ESC para salir
+int handle_keys(int key, t_cub3d *cub)
 {
-	if (key == 65307) // ESC
-		exit(0);
 	double oldDirX, oldPlaneX;
 	// W: adelante
 	if (key == 119) {
-		if (cub->map[(int)(cub->pos_y)][(int)(cub->pos_x + cub->dir_x * MOVE_SPEED)] == '0')
+		if (IS_FLOOR(cub->map[(int)(cub->pos_y)][(int)(cub->pos_x + cub->dir_x * MOVE_SPEED)]))
 			cub->pos_x += cub->dir_x * MOVE_SPEED;
-		if (cub->map[(int)(cub->pos_y + cub->dir_y * MOVE_SPEED)][(int)(cub->pos_x)] == '0')
+		if (IS_FLOOR(cub->map[(int)(cub->pos_y + cub->dir_y * MOVE_SPEED)][(int)(cub->pos_x)]))
 			cub->pos_y += cub->dir_y * MOVE_SPEED;
 	}
 	// S: atrás
 	if (key == 115) {
-		if (cub->map[(int)(cub->pos_y)][(int)(cub->pos_x - cub->dir_x * MOVE_SPEED)] == '0')
+		if (IS_FLOOR(cub->map[(int)(cub->pos_y)][(int)(cub->pos_x - cub->dir_x * MOVE_SPEED)]))
 			cub->pos_x -= cub->dir_x * MOVE_SPEED;
-		if (cub->map[(int)(cub->pos_y - cub->dir_y * MOVE_SPEED)][(int)(cub->pos_x)] == '0')
+		if (IS_FLOOR(cub->map[(int)(cub->pos_y - cub->dir_y * MOVE_SPEED)][(int)(cub->pos_x)]))
 			cub->pos_y -= cub->dir_y * MOVE_SPEED;
 	}
-	// D: rotar derecha
+	// D o flecha derecha: rotar DERECHA (+ROT_SPEED)
 	if (key == 100 || key == 65363) {
-		oldDirX = cub->dir_x;
-		cub->dir_x = cub->dir_x * cos(-ROT_SPEED) - cub->dir_y * sin(-ROT_SPEED);
-		cub->dir_y = oldDirX * sin(-ROT_SPEED) + cub->dir_y * cos(-ROT_SPEED);
-		oldPlaneX = cub->plane_x;
-		cub->plane_x = cub->plane_x * cos(-ROT_SPEED) - cub->plane_y * sin(-ROT_SPEED);
-		cub->plane_y = oldPlaneX * sin(-ROT_SPEED) + cub->plane_y * cos(-ROT_SPEED);
-	}
-	// A: rotar izquierda
-	if (key == 97 || key == 65361) {
 		oldDirX = cub->dir_x;
 		cub->dir_x = cub->dir_x * cos(ROT_SPEED) - cub->dir_y * sin(ROT_SPEED);
 		cub->dir_y = oldDirX * sin(ROT_SPEED) + cub->dir_y * cos(ROT_SPEED);
@@ -119,11 +110,23 @@ int	handle_keys(int key, t_cub3d *cub)
 		cub->plane_x = cub->plane_x * cos(ROT_SPEED) - cub->plane_y * sin(ROT_SPEED);
 		cub->plane_y = oldPlaneX * sin(ROT_SPEED) + cub->plane_y * cos(ROT_SPEED);
 	}
+	// A o flecha izquierda: rotar IZQUIERDA (-ROT_SPEED)
+	if (key == 97 || key == 65361) {
+		oldDirX = cub->dir_x;
+		cub->dir_x = cub->dir_x * cos(-ROT_SPEED) - cub->dir_y * sin(-ROT_SPEED);
+		cub->dir_y = oldDirX * sin(-ROT_SPEED) + cub->dir_y * cos(-ROT_SPEED);
+		oldPlaneX = cub->plane_x;
+		cub->plane_x = cub->plane_x * cos(-ROT_SPEED) - cub->plane_y * sin(-ROT_SPEED);
+		cub->plane_y = oldPlaneX * sin(-ROT_SPEED) + cub->plane_y * cos(-ROT_SPEED);
+	}
+	// ESC: salir
+	if (key == 65307)
+		exit(0);
 	return (0);
 }
 
 // Bucle de renderizado
-int	render_loop(t_cub3d *cub)
+int render_loop(t_cub3d *cub)
 {
 	raycast_render(cub, cub->img_data, cub->size_line, cub->bpp);
 	mlx_put_image_to_window(cub->mlx, cub->win, cub->img, 0, 0);
@@ -134,7 +137,7 @@ int	render_loop(t_cub3d *cub)
 void	init_player(t_cub3d *cub)
 {
 	for (int y = 0; y < cub->map_height; y++)
-	for (int x = 0; x < (int)ft_strlen(cub->map[y]); x++)
+	for (int x = 0; x < (int)strlen(cub->map[y]); x++)
 	{
 		if (cub->map[y][x] == 'N' || cub->map[y][x] == 'S' ||
 			cub->map[y][x] == 'E' || cub->map[y][x] == 'W')
