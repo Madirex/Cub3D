@@ -59,47 +59,29 @@ int		render_loop(t_cub3d *cub);
 void	assign_map(t_cub3d *cub, char *filename);
 void	validate_map(t_cub3d *cub);
 
-int	main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+	(void)argc;
+	int fd;
 	t_cub3d cub;
-	void *mlx;
-	void *win;
-	void *img;
+	void *mlx, *win, *img;
 	char *img_data;
 	int bpp, size_line, endian;
 
-	if (argc != 2)
-	{
-		fprintf(stderr, "Uso: %s <mapa.cub>\n", argv[0]);
-		return (1);
-	}
-
-	// Estructura cub inicializada a cero
-	memset(&cub, 0, sizeof(t_cub3d));
-
-	// Parseo de mapa y validación usando funciones del repo
+	init_cub3d(&cub);
+	// ... argumentos, validaciones, parsing ...
+	fd = open(argv[1], O_RDONLY);
+	read_map(fd, &cub);
+	close(fd);
+	validate_textures(&cub);
 	assign_map(&cub, argv[1]);
 	validate_map(&cub);
-
-	// Inicializa posición y dirección del jugador
 	init_player(&cub);
 
-	// Inicialización de MiniLibX
 	mlx = mlx_init();
-	if (!mlx)
-		return (fprintf(stderr, "Error: mlx_init() falló\n"), 1);
-
 	win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
-	if (!win)
-		return (fprintf(stderr, "Error: mlx_new_window() falló\n"), 1);
-
 	img = mlx_new_image(mlx, WIDTH, HEIGHT);
-	if (!img)
-		return (fprintf(stderr, "Error: mlx_new_image() falló\n"), 1);
-
 	img_data = mlx_get_data_addr(img, &bpp, &size_line, &endian);
 
-	// Guardar referencias en cub para acceso en render_loop y teclas
 	cub.mlx = mlx;
 	cub.win = win;
 	cub.img = img;
@@ -108,13 +90,16 @@ int	main(int argc, char *argv[])
 	cub.size_line = size_line;
 	cub.endian = endian;
 
-	// Hook de teclado (key press)
-	mlx_hook(win, 2, 1L<<0, handle_keys, &cub);
-	// Hook de renderizado: se llama cada frame
-	mlx_loop_hook(mlx, render_loop, &cub);
+	load_wall_textures(&cub, mlx);
 
-	// Iniciar loop de eventos
+	// Hooks y bucle principal igual que antes
+	mlx_hook(win, 2, 1L<<0, handle_keys, &cub);
+	mlx_loop_hook(mlx, render_loop, &cub);
 	mlx_loop(mlx);
 
+	// Liberar texturas/mapa al salir
+	free_textures(&cub.textures);
+	if (cub.map)
+		free_map(cub.map, cub.map_height);
 	return (0);
 }

@@ -71,6 +71,10 @@ typedef struct s_cub3d
 	int			player_y;	/**< Player Y position on map */
 	char		player_dir;	/**< Player initial direction (N/S/E/W) */
 
+	int			**wall_textures; // [4][tex_width*tex_height]
+    int			tex_width;
+    int			tex_height;
+
 	// --- Añadidos para raycasting y MLX ---
 	double		pos_x;      // Posición real X (con decimales)
 	double		pos_y;      // Posición real Y

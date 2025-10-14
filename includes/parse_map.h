@@ -35,5 +35,6 @@ typedef struct s_map_parse_ctx
 
 void	assign_map(t_cub3d *cub, char *filename);
 int		is_map_line(const char *line);
+void	read_map(int fd, t_cub3d *cub);
 
 #endif

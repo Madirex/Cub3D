@@ -9,17 +9,27 @@
 #define ROT_SPEED 0.055
 #define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W')
 
-static int	get_color(char cell, int side)
-{
-	int color;
+#include "../includes/cub3d.h"
+#include <mlx.h>
+#include <math.h>
+#include <string.h>
 
-	if (cell == '1') color = 0xFF0000;
-	else if (cell == '2') color = 0x00FF00;
-	else if (cell == '3') color = 0x0000FF;
-	else if (cell == '4') color = 0xFFFFFF;
-	else color = 0xFFFF00;
-	if (side == 1) color = (color >> 1) & 0x7F7F7F;
-	return color;
+#define WIDTH 640
+#define HEIGHT 480
+#define MOVE_SPEED 0.09
+#define ROT_SPEED 0.055
+#define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W')
+
+static int	get_wall_texture(int side, double rayDirX, double rayDirY)
+{
+	if (side == 0 && rayDirX < 0)
+		return 0; // NO
+	else if (side == 0 && rayDirX > 0)
+		return 1; // SO
+	else if (side == 1 && rayDirY < 0)
+		return 2; // WE
+	else
+		return 3; // EA
 }
 
 void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
@@ -70,18 +80,41 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 		int drawEnd = lineHeight / 2 + HEIGHT / 2;
 		if (drawEnd >= HEIGHT) drawEnd = HEIGHT - 1;
 
-		int color = get_color(cub->map[mapY][mapX], side);
+		// --- TEXTURAS ---
+		int texNum = get_wall_texture(side, rayDirX, rayDirY);
+		double wallX;
+		if (side == 0)
+			wallX = cub->pos_y + perpWallDist * rayDirY;
+		else
+			wallX = cub->pos_x + perpWallDist * rayDirX;
+		wallX -= floor(wallX);
 
-		// Fondo (negro arriba, gris abajo)
+		int texX = (int)(wallX * (double)cub->tex_width);
+		if (side == 0 && rayDirX > 0) texX = cub->tex_width - texX - 1;
+		if (side == 1 && rayDirY < 0) texX = cub->tex_width - texX - 1;
+
+		double step = 1.0 * cub->tex_height / lineHeight;
+		double texPos = (drawStart - HEIGHT / 2 + lineHeight / 2) * step;
+
+		// Fondo (techo y suelo)
 		for (int y = 0; y < drawStart; y++)
 			*(unsigned int *)(img_data + (y * size_line + x * (bpp/8))) = 0x202020;
-		for (int y = drawEnd+1; y < HEIGHT; y++)
+		for (int y = drawEnd + 1; y < HEIGHT; y++)
 			*(unsigned int *)(img_data + (y * size_line + x * (bpp/8))) = 0x707070;
-		// Pared
+
+		// --- Dibuja la pared con textura ---
 		for (int y = drawStart; y <= drawEnd; y++)
+		{
+			int texY = (int)texPos & (cub->tex_height - 1);
+			texPos += step;
+			int color = cub->wall_textures[texNum][cub->tex_width * texY + texX];
+			if (side == 1)
+				color = (color >> 1) & 0x7F7F7F; // sombra en laterales
 			*(unsigned int *)(img_data + (y * size_line + x * (bpp/8))) = color;
+		}
 	}
 }
+// El resto de funciones (movimiento, render_loop, init_player) igual que antes
 
 // Movimiento y rotación con WASD y flechas, ESC para salir
 int handle_keys(int key, t_cub3d *cub)

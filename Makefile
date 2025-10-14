@@ -17,6 +17,7 @@ SRC_FILES   = main \
 			  validations/validate_map \
 			  validations/validation_utils \
 			  loader/map_loader \
+			  loader/texture_loader \
 			  utils/utils \
 			  utils/assign_utils \
 			  utils/map_utils \
