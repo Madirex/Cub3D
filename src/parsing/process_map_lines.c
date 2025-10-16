@@ -168,7 +168,7 @@ void	process_map_lines(t_cub3d *cub, int fd, t_map_parse_ctx *ctx)
 			check_no_content_after_map(cub, fd, ctx, line);
 			break ;
 		}
-		if (is_map_line(line))
+		if (is_map_line(line, cub))
 		{
 			reading_map = 1;
 			handle_map_line(cub, ctx, line);

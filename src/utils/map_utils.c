@@ -27,12 +27,19 @@
  * @brief Checks if a character is valid for map content
  * 
  * @param c Character to validate
+ * @param cub Pointer to the main cub3d structure (for bonus check)
  * @return 1 if character is valid for maps, 0 otherwise
  */
-static int	is_valid_map_char(char c)
+static int	is_valid_map_char(char c, t_cub3d *cub)
 {
-	return (c == '0' || c == '1' || c == 'N' || c == 'S'
-		|| c == 'E' || c == 'W' || c == ' ' || c == '\t');
+	if (c == '0' || c == '1' || c == 'N' || c == 'S'
+        || c == 'E' || c == 'W' || c == ' ' || c == '\t')
+        return (1);
+        
+    if (cub->is_bonus && (c == 'D' || c == 'd'))
+        return (1);
+
+    return (0);
 }
 
 /**
@@ -85,9 +92,10 @@ void	free_map(char **map, int height)
  * and has at least one non-whitespace character.
  * 
  * @param line The line to check
+ * @param cub Pointer to the main cub3d structure (for bonus check)
  * @return 1 if it's a valid map line, 0 otherwise
  */
-int	is_map_line(const char *line)
+int	is_map_line(const char *line, t_cub3d *cub)
 {
 	int	i;
 	int	has_valid_char;
@@ -98,7 +106,7 @@ int	is_map_line(const char *line)
 	has_valid_char = 0;
 	while (line[i])
 	{
-		if (!is_valid_map_char(line[i]) && line[i] != '\n')
+		if (!is_valid_map_char(line[i], cub) && line[i] != '\n')
 			return (0);
 		if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n')
 			has_valid_char = 1;

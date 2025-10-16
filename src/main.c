@@ -31,24 +31,10 @@
 #include "../includes/utils.h"
 #include	 <string.h>
 #include <mlx.h>
-// void	assign_texture(t_cub3d *cub, char *line);
-// int		validate_file_extension(char *filename);
-// void	validate_textures(t_cub3d *cub);
-// void	init_cub3d(t_cub3d *cub);
-// void	read_map(int fd, t_cub3d *cub);
 
-/**
- * @brief Main entry point of the Cub3D program
- * 
- * Handles command line arguments, file validation, parsing,
- * and cleanup of resources.
- * 
- * @param argc Number of command line arguments
- * @param argv Array of command line arguments
- * @return 0 on success, 1 on error
- */
 #define WIDTH 640
 #define HEIGHT 480
+#define IS_BONUS 1
 
 // Prototipos de funciones implementadas en raycast.c
 void	init_player(t_cub3d *cub);
@@ -60,6 +46,16 @@ int		render_loop(t_cub3d *cub);
 void	assign_map(t_cub3d *cub, char *filename);
 void	validate_map(t_cub3d *cub);
 
+/**
+ * @brief Main entry point of the Cub3D program
+ * 
+ * Handles command line arguments, file validation, parsing,
+ * and cleanup of resources.
+ * 
+ * @param argc Number of command line arguments
+ * @param argv Array of command line arguments
+ * @return 0 on success, 1 on error
+ */
 int main(int argc, char *argv[]) {
 	(void)argc;
 	int fd;
@@ -68,8 +64,7 @@ int main(int argc, char *argv[]) {
 	char *img_data;
 	int bpp, size_line, endian;
 
-	init_cub3d(&cub);
-	// ... argumentos, validaciones, parsing ...
+	init_cub3d(&cub, IS_BONUS);
 	fd = open(argv[1], O_RDONLY);
 	read_map(fd, &cub);
 	close(fd);

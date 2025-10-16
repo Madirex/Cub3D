@@ -90,8 +90,9 @@ int	is_whitespace_only(const char *line)
  * to indicate they haven't been set yet.
  * 
  * @param cub Pointer to the main Cub3D structure to initialize
+ * @param is_bonus Flag indicating if bonus features are enabled
  */
-void	init_cub3d(t_cub3d *cub)
+void	init_cub3d(t_cub3d *cub, int is_bonus)
 {
 	ft_memset(cub, 0, sizeof(t_cub3d));
 	cub->textures.floor.r = -1;
@@ -100,4 +101,5 @@ void	init_cub3d(t_cub3d *cub)
 	cub->textures.ceiling.r = -1;
 	cub->textures.ceiling.g = -1;
 	cub->textures.ceiling.b = -1;
+	cub->is_bonus = is_bonus;
 }

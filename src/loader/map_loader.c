@@ -65,7 +65,7 @@ static void	process_texture_or_color_line(t_cub3d *cub, char *line)
  */
 static int	check_map_start(t_cub3d *cub, char *line)
 {
-	if (is_map_line(line))
+	if (is_map_line(line, cub))
 	{
 		if (!cub->textures.no || !cub->textures.so
 			|| !cub->textures.we || !cub->textures.ea

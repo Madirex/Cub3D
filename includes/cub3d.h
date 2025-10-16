@@ -74,6 +74,7 @@ typedef struct s_cub3d
 	int			**wall_textures; // [4][tex_width*tex_height]
     int			tex_width;
     int			tex_height;
+	int			is_bonus;
 
 	// --- Añadidos para raycasting y MLX ---
 	int			is_moving_forward;
