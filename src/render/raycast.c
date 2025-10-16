@@ -13,6 +13,7 @@
 /* Prototipo de la función centralizada de salida (implementada en main.c) */
 int exit_program(t_cub3d *cub);
 void ft_error(char *message, t_cub3d *cub, char *line);
+void draw_door_prompt(t_cub3d *cub);
 
 static int get_wall_texture(int side, double rayDirX, double rayDirY)
 {
@@ -321,7 +322,55 @@ int render_loop(t_cub3d *cub)
     perform_movements(cub);
     raycast_render(cub, cub->img_data, cub->size_line, cub->bpp);
     mlx_put_image_to_window(cub->mlx, cub->win, cub->img, 0, 0);
+    draw_door_prompt(cub);
     return (0);
+}
+
+/**
+ * @brief Draws the door action prompt based on door state, checking for two cases:
+ * 1. Player is standing inside the door cell ('O' open).
+ * 2. Player is facing a door ('D' or 'O') within interaction distance.
+ *
+ * @param cub Pointer to the main Cub3D structure.
+ */
+void draw_door_prompt(t_cub3d *cub)
+{
+    int target_mapX;
+    int target_mapY;
+    const char *message;
+    char target_cell;
+    
+    const double check_dist_near = 0.75; 
+    const double check_dist_far = 1.5; 
+
+    target_mapX = (int)(cub->pos_x + cub->dir_x * check_dist_near);  
+    target_mapY = (int)(cub->pos_y + cub->dir_y * check_dist_near);
+    
+    if ((int)cub->pos_x == target_mapX && (int)cub->pos_y == target_mapY)
+    {
+        target_mapX = (int)(cub->pos_x + cub->dir_x * check_dist_far);
+        target_mapY = (int)(cub->pos_y + cub->dir_y * check_dist_far);
+    }
+    
+    if (target_mapY < 0 || target_mapY >= cub->map_height ||
+        target_mapX < 0 || target_mapX >= (int)strlen(cub->map[target_mapY]))
+        return;
+
+    target_cell = cub->map[target_mapY][target_mapX];
+
+    if (cub->is_bonus && (target_cell == 'D' || target_cell == 'O'))
+    {
+        if (target_cell == 'D')
+            message = "Press SPACE to open";
+        else
+            message = "Press SPACE to close";
+            
+        mlx_string_put(cub->mlx, cub->win,
+            (WIDTH / 2) - 100, 
+            HEIGHT - 50,
+            0xFFFFFF,
+            (char *)message);
+    }
 }
 
 // Inicializa la posición/dirección del jugador según el mapa
