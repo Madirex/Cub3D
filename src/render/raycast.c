@@ -10,6 +10,9 @@
 #define ROT_SPEED 0.055
 #define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W')
 
+/* Prototipo de la función centralizada de salida (implementada en main.c) */
+int exit_program(t_cub3d *cub);
+
 static int	get_wall_texture(int side, double rayDirX, double rayDirY)
 {
 	if (side == 0 && rayDirX < 0)
@@ -22,8 +25,32 @@ static int	get_wall_texture(int side, double rayDirX, double rayDirY)
 		return 3; // EA
 }
 
+/* Convierte componentes r,g,b (0-255) a entero RGB 0xRRGGBB */
+static int	rgb_to_int(int r, int g, int b)
+{
+	return ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+}
+
 void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 {
+	int bytes_per_pixel = bpp / 8;
+
+	/* Precalcular colores de techo/suelo usando los valores parseados.
+	 * Si algún componente no está definido (-1) usamos un color por defecto. */
+	int ceiling_color;
+	int floor_color;
+	if (cub->textures.ceiling.r != -1)
+		ceiling_color = rgb_to_int(cub->textures.ceiling.r,
+				cub->textures.ceiling.g, cub->textures.ceiling.b);
+	else
+		ceiling_color = 0x202020; /* fallback */
+
+	if (cub->textures.floor.r != -1)
+		floor_color = rgb_to_int(cub->textures.floor.r,
+				cub->textures.floor.g, cub->textures.floor.b);
+	else
+		floor_color = 0x707070; /* fallback */
+
 	for (int x = 0; x < WIDTH; x++)
 	{
 		double cameraX = 2 * x / (double)WIDTH - 1;
@@ -86,11 +113,17 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 		double step = 1.0 * cub->tex_height / lineHeight;
 		double texPos = (drawStart - HEIGHT / 2 + lineHeight / 2) * step;
 
-		// Fondo (techo y suelo)
+		// Fondo (techo y suelo) usando colores parseados
 		for (int y = 0; y < drawStart; y++)
-			*(unsigned int *)(img_data + (y * size_line + x * (bpp/8))) = 0x202020;
+		{
+			unsigned int *pixel = (unsigned int *)(img_data + (y * size_line + x * bytes_per_pixel));
+			*pixel = (unsigned int)ceiling_color;
+		}
 		for (int y = drawEnd + 1; y < HEIGHT; y++)
-			*(unsigned int *)(img_data + (y * size_line + x * (bpp/8))) = 0x707070;
+		{
+			unsigned int *pixel = (unsigned int *)(img_data + (y * size_line + x * bytes_per_pixel));
+			*pixel = (unsigned int)floor_color;
+		}
 
 		// --- Dibuja la pared con textura ---
 		for (int y = drawStart; y <= drawEnd; y++)
@@ -100,7 +133,8 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 			int color = cub->wall_textures[texNum][cub->tex_width * texY + texX];
 			if (side == 1)
 				color = (color >> 1) & 0x7F7F7F; // sombra en laterales
-			*(unsigned int *)(img_data + (y * size_line + x * (bpp/8))) = color;
+			unsigned int *pixel = (unsigned int *)(img_data + (y * size_line + x * bytes_per_pixel));
+			*pixel = (unsigned int)color;
 		}
 	}
 }
