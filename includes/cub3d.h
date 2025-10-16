@@ -119,4 +119,6 @@ typedef struct s_readmap_ctx
 	int		stop;	/**< Stop flag */
 }	t_readmap_ctx;
 
+int	exit_program(t_cub3d *cub);
+
 #endif

@@ -117,7 +117,7 @@ int handle_key_press(int key, t_cub3d *cub)
     else if (key == 100 || key == 65363) // D o Flecha Derecha
         cub->is_rotating_right = 1;
     else if (key == 65307) // ESC
-        exit(0);
+        return (exit_program(cub));
     return (0);
 }
 

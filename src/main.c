@@ -60,6 +60,25 @@ int		render_loop(t_cub3d *cub);
 void	assign_map(t_cub3d *cub, char *filename);
 void	validate_map(t_cub3d *cub);
 
+
+
+/* Funcion de salida y limpieza del programa */
+
+int	exit_program(t_cub3d *cub)
+{
+	if (!cub)
+		exit(0);
+	if (cub->img && cub->mlx)
+		mlx_destroy_image(cub->mlx, cub->img);
+	if (cub->win && cub->mlx)
+		mlx_destroy_window(cub->mlx, cub->win);
+	free_textures(&cub->textures);
+	if (cub->map)
+		free_map(cub->map, cub->map_height);
+	exit(0);
+	return (0);
+}
+
 int main(int argc, char *argv[]) {
 	(void)argc;
 	int fd;
@@ -96,6 +115,7 @@ int main(int argc, char *argv[]) {
 	// Hooks y bucle principal igual que antes
 	mlx_hook(cub.win, 2, 1L<<0, handle_key_press, &cub);
 	mlx_hook(cub.win, 3, 1L<<1, handle_key_release, &cub);
+	mlx_hook(cub.win, 17, 0, exit_program, &cub);
 	mlx_loop_hook(mlx, render_loop, &cub);
 	mlx_loop(mlx);
 
