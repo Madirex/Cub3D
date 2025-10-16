@@ -4,8 +4,8 @@
 #include <string.h>
 #include <sys/time.h>
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 1248
+#define HEIGHT 960
 #define MOVE_SPEED 0.09
 #define ROT_SPEED 0.055
 #define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W' || (c) == 'O') // TODO: refactor esto, meter en map_utils junto a is_valid_map_char

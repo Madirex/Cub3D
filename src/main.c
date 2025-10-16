@@ -32,8 +32,8 @@
 #include <string.h>
 #include <mlx.h>
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 1248
+#define HEIGHT 960
 #define IS_BONUS 1
 
 // Prototipos de funciones implementadas en raycast.c
