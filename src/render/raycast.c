@@ -10,6 +10,15 @@
 #define ROT_SPEED 0.055
 #define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W' || (c) == 'O') // TODO: refactor esto, meter en map_utils junto a is_valid_map_char
 
+#define MINIMAP_SCALE 12         // Size of each map cell in pixels
+#define MINIMAP_MARGIN 10        // Margin from the top-left corner
+#define MINIMAP_VIEW_RADIUS 5    // Radius of cells to display around the player
+
+#define COLOR_WALL 0x404040      // Dark gray for walls ('1', 'D')
+#define COLOR_FLOOR 0x808080     // Medium gray for floor ('0', 'O', 'N', 'S', 'E', 'W')
+#define COLOR_PLAYER 0xFF0000    // Red for the player
+#define COLOR_EMPTY 0x000000     // Black for out-of-bounds cells
+
 /* Prototipo de la función centralizada de salida (implementada en main.c) */
 int exit_program(t_cub3d *cub);
 void ft_error(char *message, t_cub3d *cub, char *line);
@@ -39,6 +48,84 @@ static int get_wall_texture(int side, double rayDirX, double rayDirY)
 static int	rgb_to_int(int r, int g, int b)
 {
 	return ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+}
+
+static void draw_pixel(char *img_data, int size_line, int bpp, int x, int y, int color)
+{
+    int bytes_per_pixel = bpp / 8;
+    if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)
+    {
+        unsigned int *pixel = (unsigned int *)(img_data + (y * size_line + x * bytes_per_pixel));
+        *pixel = (unsigned int)color;
+    }
+}
+
+void draw_minimap(t_cub3d *cub, char *img_data, int size_line, int bpp)
+{
+    int map_cell_x, map_cell_y, pixel_x, pixel_y, color;
+    int center_map_x = (int)cub->pos_x;
+    int center_map_y = (int)cub->pos_y;
+    int minimap_start_x = MINIMAP_MARGIN;
+    int minimap_start_y = MINIMAP_MARGIN;
+
+    for (int i = -MINIMAP_VIEW_RADIUS; i <= MINIMAP_VIEW_RADIUS; i++)
+    {
+        for (int j = -MINIMAP_VIEW_RADIUS; j <= MINIMAP_VIEW_RADIUS; j++)
+        {
+            map_cell_x = center_map_x + j;
+            map_cell_y = center_map_y + i;
+            int cell_draw_x = minimap_start_x + (j + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
+            int cell_draw_y = minimap_start_y + (i + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
+
+            color = COLOR_EMPTY;
+            if (map_cell_y >= 0 && map_cell_y < cub->map_height &&
+                map_cell_x >= 0 && cub->map[map_cell_y] &&
+                map_cell_x < (int)strlen(cub->map[map_cell_y]))
+            {
+                char cell = cub->map[map_cell_y][map_cell_x];
+                if (cell == '1' || cell == 'D')
+                    color = COLOR_WALL;
+                else if (IS_FLOOR(cell))
+                    color = COLOR_FLOOR;
+            }
+
+            for (pixel_y = 0; pixel_y < MINIMAP_SCALE; pixel_y++)
+            {
+                for (pixel_x = 0; pixel_x < MINIMAP_SCALE; pixel_x++)
+                {
+                    if (pixel_x == 0 || pixel_y == 0)
+                        draw_pixel(img_data, size_line, bpp, cell_draw_x + pixel_x, cell_draw_y + pixel_y, 0x000000);
+                    else
+                        draw_pixel(img_data, size_line, bpp, cell_draw_x + pixel_x, cell_draw_y + pixel_y, color);
+                }
+            }
+        }
+    }
+
+    int player_center_x = minimap_start_x + MINIMAP_VIEW_RADIUS * MINIMAP_SCALE + MINIMAP_SCALE / 2;
+    int player_center_y = minimap_start_y + MINIMAP_VIEW_RADIUS * MINIMAP_SCALE + MINIMAP_SCALE / 2;
+    double relative_x = cub->pos_x - center_map_x;
+    double relative_y = cub->pos_y - center_map_y;
+    int player_pixel_x = player_center_x + (int)((relative_x - 0.5) * MINIMAP_SCALE);
+    int player_pixel_y = player_center_y + (int)((relative_y - 0.5) * MINIMAP_SCALE);
+
+    int player_size = MINIMAP_SCALE / 4;
+    for (int y = player_pixel_y - player_size / 2; y < player_pixel_y + player_size / 2; y++)
+    {
+        for (int x = player_pixel_x - player_size / 2; x < player_pixel_x + player_size / 2; x++)
+        {
+            draw_pixel(img_data, size_line, bpp, x, y, COLOR_PLAYER);
+        }
+    }
+
+    int dir_len = MINIMAP_SCALE / 2;
+    int dir_end_x = player_pixel_x + (int)(cub->dir_x * dir_len);
+    int dir_end_y = player_pixel_y + (int)(cub->dir_y * dir_len);
+    draw_pixel(img_data, size_line, bpp, dir_end_x, dir_end_y, COLOR_PLAYER);
+    draw_pixel(img_data, size_line, bpp, dir_end_x + 1, dir_end_y, COLOR_PLAYER);
+    draw_pixel(img_data, size_line, bpp, dir_end_x, dir_end_y + 1, COLOR_PLAYER);
+    draw_pixel(img_data, size_line, bpp, dir_end_x - 1, dir_end_y, COLOR_PLAYER);
+    draw_pixel(img_data, size_line, bpp, dir_end_x, dir_end_y - 1, COLOR_PLAYER);
 }
 
 void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
@@ -314,13 +401,12 @@ long fn_get_time_in_ms(void)
 // Bucle de renderizado
 int render_loop(t_cub3d *cub)
 {
-    long current_time;
-
-    current_time = fn_get_time_in_ms();
-    cub->time_frame = (current_time - cub->time_prev) / 1000.0; 
+    long current_time = fn_get_time_in_ms();
+    cub->time_frame = (current_time - cub->time_prev) / 1000.0;
     cub->time_prev = current_time;
     perform_movements(cub);
     raycast_render(cub, cub->img_data, cub->size_line, cub->bpp);
+    draw_minimap(cub, cub->img_data, cub->size_line, cub->bpp);
     mlx_put_image_to_window(cub->mlx, cub->win, cub->img, 0, 0);
     draw_door_prompt(cub);
     return (0);
