@@ -29,7 +29,7 @@
 #include "../includes/map_utils.h"
 #include "../includes/validate_map.h"
 #include "../includes/utils.h"
-#include	 <string.h>
+#include <string.h>
 #include <mlx.h>
 
 #define WIDTH 640
@@ -57,7 +57,6 @@ void	validate_map(t_cub3d *cub);
  * @return 0 on success, 1 on error
  */
 
-
 /* Funcion de salida y limpieza del programa */
 
 int	exit_program(t_cub3d *cub)
@@ -75,13 +74,14 @@ int	exit_program(t_cub3d *cub)
 	return (0);
 }
 
-int main(int argc, char *argv[]) {
-	(void)argc;
-	int fd;
-	t_cub3d cub;
-	void *mlx, *win, *img;
-	char *img_data;
-	int bpp, size_line, endian;
+int	main(int argc, char *argv[])
+{
+	(void)	argc;
+	int		fd;
+	t_cub3d	cub;
+	void	*mlx, *win, *img;
+	char	*img_data;
+	int		bpp, size_line, endian;
 
 	init_cub3d(&cub, IS_BONUS);
 	fd = open(argv[1], O_RDONLY);
@@ -91,12 +91,10 @@ int main(int argc, char *argv[]) {
 	assign_map(&cub, argv[1]);
 	validate_map(&cub);
 	init_player(&cub);
-
 	mlx = mlx_init();
 	win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
 	img = mlx_new_image(mlx, WIDTH, HEIGHT);
 	img_data = mlx_get_data_addr(img, &bpp, &size_line, &endian);
-
 	cub.mlx = mlx;
 	cub.win = win;
 	cub.img = img;
@@ -104,17 +102,12 @@ int main(int argc, char *argv[]) {
 	cub.bpp = bpp;
 	cub.size_line = size_line;
 	cub.endian = endian;
-
 	load_wall_textures(&cub, mlx);
-
-	// Hooks y bucle principal igual que antes
-	mlx_hook(cub.win, 2, 1L<<0, handle_key_press, &cub);
-	mlx_hook(cub.win, 3, 1L<<1, handle_key_release, &cub);
+	mlx_hook(cub.win, 2, 1L << 0, handle_key_press, &cub);
+	mlx_hook(cub.win, 3, 1L << 1, handle_key_release, &cub);
 	mlx_hook(cub.win, 17, 0, exit_program, &cub);
 	mlx_loop_hook(mlx, render_loop, &cub);
 	mlx_loop(mlx);
-
-	// Liberar texturas/mapa al salir
 	free_textures(&cub.textures);
 	if (cub.map)
 		free_map(cub.map, cub.map_height);
