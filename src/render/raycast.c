@@ -13,16 +13,24 @@
 /* Prototipo de la función centralizada de salida (implementada en main.c) */
 int exit_program(t_cub3d *cub);
 
-static int	get_wall_texture(int side, double rayDirX, double rayDirY)
+static int get_wall_texture(int side, double rayDirX, double rayDirY)
 {
-	if (side == 0 && rayDirX < 0)
-		return 0; // NO
-	else if (side == 0 && rayDirX > 0)
-		return 1; // SO
-	else if (side == 1 && rayDirY < 0)
-		return 2; // WE
+	if (side == 0)
+	{
+		/* impacto en pared vertical (se avanzó en X): elegir WE o EA según rayDirX */
+		if (rayDirX > 0)
+			return 2; /* WE */
+		else
+			return 3; /* EA */
+	}
 	else
-		return 3; // EA
+	{
+		/* impacto en pared horizontal (se avanzó en Y): elegir SO o NO según rayDirY */
+		if (rayDirY > 0)
+			return 1; /* SO */
+		else
+			return 0; /* NO */
+	}
 }
 
 /* Convierte componentes r,g,b (0-255) a entero RGB 0xRRGGBB */
