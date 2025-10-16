@@ -36,9 +36,24 @@ void load_wall_textures(t_cub3d *cub, void *mlx)
     cub->wall_textures[3] = load_xpm_buffer(mlx, cub->textures.ea, &w, &h);
     cub->tex_width = w;
     cub->tex_height = h;
+
+if (cub->is_bonus)
+    {
+        cub->door_textures = malloc(sizeof(int *) * 2); 
+        cub->door_textures[0] = load_xpm_buffer(mlx, cub->textures.door_closed, &w, &h);
+        cub->door_textures[1] = load_xpm_buffer(mlx, cub->textures.door_open, &w, &h);
+        if (!cub->door_textures[0] || !cub->door_textures[1]) {
+            fprintf(stderr, "Error: door texture not loaded\n");
+            exit(1);
+        }
+    }
+    else
+    {
+        cub->door_textures = NULL;
+    }
     for (int i = 0; i < 4; i++)
         if (!cub->wall_textures[i]) {
-            fprintf(stderr, "Error: textura %d no cargada\n", i);
+            fprintf(stderr, "Error: wall texture %d not loaded\n", i);
             exit(1);
         }
 }

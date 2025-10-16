@@ -90,7 +90,7 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 			if (mapY < 0 || mapY >= cub->map_height || mapX < 0 || mapX >= (int)strlen(cub->map[mapY]))
 				break;
 			char cell = cub->map[mapY][mapX];
-			if (cell == '1')
+			if (cell == '1' || (cub->is_bonus && cell == 'D'))
 				hit = 1;
 		}
 		if (!hit) continue;
@@ -106,8 +106,19 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 		if (drawEnd >= HEIGHT) drawEnd = HEIGHT - 1;
 
 		// --- TEXTURAS ---
-		int texNum = get_wall_texture(side, rayDirX, rayDirY);
+		char cell_hit = cub->map[mapY][mapX];
+        int *current_texture_buffer;
+        
+        if (cub->is_bonus && cell_hit == 'D')
+            current_texture_buffer = cub->door_textures[0];
+        else
+        {
+            int texNum = get_wall_texture(side, rayDirX, rayDirY);
+            current_texture_buffer = cub->wall_textures[texNum];
+        }
+        
 		double wallX;
+
 		if (side == 0)
 			wallX = cub->pos_y + perpWallDist * rayDirY;
 		else
@@ -138,7 +149,7 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 		{
 			int texY = (int)texPos & (cub->tex_height - 1);
 			texPos += step;
-			int color = cub->wall_textures[texNum][cub->tex_width * texY + texX];
+			int color = current_texture_buffer[cub->tex_width * texY + texX];
 			if (side == 1)
 				color = (color >> 1) & 0x7F7F7F; // sombra en laterales
 			unsigned int *pixel = (unsigned int *)(img_data + (y * size_line + x * bytes_per_pixel));

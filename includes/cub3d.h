@@ -72,6 +72,7 @@ typedef struct s_cub3d
 	char		player_dir;	/**< Player initial direction (N/S/E/W) */
 
 	int			**wall_textures; // [4][tex_width*tex_height]
+	int         **door_textures; // [1][tex_width*tex_height]
     int			tex_width;
     int			tex_height;
 	int			is_bonus;
