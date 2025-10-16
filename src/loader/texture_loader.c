@@ -29,37 +29,37 @@ int *load_xpm_buffer(void *mlx, char *path, int *width, int *height)
 void load_wall_textures(t_cub3d *cub, void *mlx)
 {
     int w, h;
-    int texture_count;
 
-    texture_count = 4;
-    if (cub->is_bonus)
-        texture_count += 2;
-    cub->wall_textures = malloc(sizeof(int *) * texture_count);
+    cub->wall_textures = malloc(sizeof(int *) * 4);
     cub->wall_textures[0] = load_xpm_buffer(mlx, cub->textures.no, &w, &h);
     cub->wall_textures[1] = load_xpm_buffer(mlx, cub->textures.so, &w, &h);
     cub->wall_textures[2] = load_xpm_buffer(mlx, cub->textures.we, &w, &h);
     cub->wall_textures[3] = load_xpm_buffer(mlx, cub->textures.ea, &w, &h);
-    if (cub->is_bonus) {
-        cub->wall_textures[4] = load_xpm_buffer(mlx, cub->textures.door_closed, &w, &h);
-        cub->wall_textures[5] = load_xpm_buffer(mlx, cub->textures.door_open, &w, &h);
-    }
     cub->tex_width = w;
     cub->tex_height = h;
 
-if (cub->is_bonus)
+    if (cub->is_bonus)
     {
-        cub->door_textures = malloc(sizeof(int *) * 2); 
-        cub->door_textures[0] = load_xpm_buffer(mlx, cub->textures.door_closed, &w, &h);
-        cub->door_textures[1] = load_xpm_buffer(mlx, cub->textures.door_open, &w, &h);
-        if (!cub->door_textures[0] || !cub->door_textures[1]) {
-            fprintf(stderr, "Error: door texture not loaded\n");
-            exit(1);
+        if (cub->textures.door_closed != NULL)
+        {
+            cub->door_textures = malloc(sizeof(int *) * 2);
+            if (!cub->door_textures)
+                exit(1);
+            cub->door_textures[0] = load_xpm_buffer(mlx, cub->textures.door_closed, &w, &h);
+            if (cub->textures.door_open != NULL)
+                cub->door_textures[1] = load_xpm_buffer(mlx, cub->textures.door_open, &w, &h);
+            else
+                cub->door_textures[1] = NULL;
+            if (!cub->door_textures[0]) {
+                fprintf(stderr, "Error: door texture DC path defined but failed to load\n");
+                exit(1);
+            }
         }
+        else
+            cub->door_textures = NULL;
     }
     else
-    {
         cub->door_textures = NULL;
-    }
     for (int i = 0; i < 4; i++)
         if (!cub->wall_textures[i]) {
             fprintf(stderr, "Error: wall texture %d not loaded\n", i);

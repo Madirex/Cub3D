@@ -12,6 +12,7 @@
 
 /* Prototipo de la función centralizada de salida (implementada en main.c) */
 int exit_program(t_cub3d *cub);
+void ft_error(char *message, t_cub3d *cub, char *line);
 
 static int get_wall_texture(int side, double rayDirX, double rayDirY)
 {
@@ -105,29 +106,28 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 		int drawEnd = lineHeight / 2 + HEIGHT / 2;
 		if (drawEnd >= HEIGHT) drawEnd = HEIGHT - 1;
 
-		// --- TEXTURAS ---
 		char cell_hit = cub->map[mapY][mapX];
         int *current_texture_buffer;
+        int texNum;
+        if (cub->is_bonus && cell_hit == 'D' && cub->door_textures != NULL && cub->door_textures[0] != NULL)
+			current_texture_buffer = cub->door_textures[0];
+		else
+		{
+		texNum = get_wall_texture(side, rayDirX, rayDirY);
+		current_texture_buffer = cub->wall_textures[texNum];
+		}
         
-        if (cub->is_bonus && cell_hit == 'D')
-            current_texture_buffer = cub->door_textures[0];
-        else
-        {
-            int texNum = get_wall_texture(side, rayDirX, rayDirY);
-            current_texture_buffer = cub->wall_textures[texNum];
-        }
-        
-		double wallX;
+        double wallX;
 
 		if (side == 0)
 			wallX = cub->pos_y + perpWallDist * rayDirY;
 		else
 			wallX = cub->pos_x + perpWallDist * rayDirX;
-		wallX -= floor(wallX);
+        wallX -= floor(wallX);
 
 		int texX = (int)(wallX * (double)cub->tex_width);
-		if (side == 0 && rayDirX > 0) texX = cub->tex_width - texX - 1;
-		if (side == 1 && rayDirY < 0) texX = cub->tex_width - texX - 1;
+            if (side == 0 && rayDirX > 0) texX = cub->tex_width - texX - 1;
+            if (side == 1 && rayDirY < 0) texX = cub->tex_width - texX - 1;
 
 		double step = 1.0 * cub->tex_height / lineHeight;
 		double texPos = (drawStart - HEIGHT / 2 + lineHeight / 2) * step;
@@ -150,8 +150,8 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 			int texY = (int)texPos & (cub->tex_height - 1);
 			texPos += step;
 			int color = current_texture_buffer[cub->tex_width * texY + texX];
-			if (side == 1)
-				color = (color >> 1) & 0x7F7F7F; // sombra en laterales
+            if (side == 1)
+                color = (color >> 1) & 0x7F7F7F;
 			unsigned int *pixel = (unsigned int *)(img_data + (y * size_line + x * bytes_per_pixel));
 			*pixel = (unsigned int)color;
 		}
