@@ -85,4 +85,10 @@ void	assign_texture(t_cub3d *cub, char *line)
 		set_texture(&cub->textures.we, line, i);
 	else if (is_texture_line(line, "EA "))
 		set_texture(&cub->textures.ea, line, i);
+	else if (cub->is_bonus && is_texture_line(line, "DC "))
+		set_texture(&cub->textures.door_closed, line, i);
+	else if (cub->is_bonus && is_texture_line(line, "DO "))
+		set_texture(&cub->textures.door_open, line, i);
+	else
+		ft_error("Invalid texture identifier", cub, line);
 }

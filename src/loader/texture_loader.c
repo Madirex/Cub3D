@@ -29,6 +29,7 @@ int *load_xpm_buffer(void *mlx, char *path, int *width, int *height)
 void load_wall_textures(t_cub3d *cub, void *mlx)
 {
     int w, h;
+
     cub->wall_textures = malloc(sizeof(int *) * 4);
     cub->wall_textures[0] = load_xpm_buffer(mlx, cub->textures.no, &w, &h);
     cub->wall_textures[1] = load_xpm_buffer(mlx, cub->textures.so, &w, &h);
@@ -36,9 +37,32 @@ void load_wall_textures(t_cub3d *cub, void *mlx)
     cub->wall_textures[3] = load_xpm_buffer(mlx, cub->textures.ea, &w, &h);
     cub->tex_width = w;
     cub->tex_height = h;
+
+    if (cub->is_bonus)
+    {
+        if (cub->textures.door_closed != NULL)
+        {
+            cub->door_textures = malloc(sizeof(int *) * 2);
+            if (!cub->door_textures)
+                exit(1);
+            cub->door_textures[0] = load_xpm_buffer(mlx, cub->textures.door_closed, &w, &h);
+            if (cub->textures.door_open != NULL)
+                cub->door_textures[1] = load_xpm_buffer(mlx, cub->textures.door_open, &w, &h);
+            else
+                cub->door_textures[1] = NULL;
+            if (!cub->door_textures[0]) {
+                fprintf(stderr, "Error: door texture DC path defined but failed to load\n");
+                exit(1);
+            }
+        }
+        else
+            cub->door_textures = NULL;
+    }
+    else
+        cub->door_textures = NULL;
     for (int i = 0; i < 4; i++)
         if (!cub->wall_textures[i]) {
-            fprintf(stderr, "Error: textura %d no cargada\n", i);
+            fprintf(stderr, "Error: wall texture %d not loaded\n", i);
             exit(1);
         }
 }

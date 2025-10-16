@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 17:27:44 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/07/09 20:05:54 by anmateo-         ###   ########.fr       */
+/*   Updated: 2025/10/16 17:09:09 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,10 @@ static int	is_valid_map_char(char c, t_cub3d *cub)
 	if (c == '0' || c == '1' || c == 'N' || c == 'S'
         || c == 'E' || c == 'W' || c == ' ' || c == '\t')
         return (1);
-        
-    if (cub->is_bonus && (c == 'D' || c == 'd'))
+    
+    if (cub->is_bonus && (c == 'D' || c == 'd')
+		&& cub->textures.door_closed && cub->textures.door_open)
         return (1);
-
     return (0);
 }
 
