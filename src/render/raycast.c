@@ -8,7 +8,7 @@
 #define HEIGHT 480
 #define MOVE_SPEED 0.09
 #define ROT_SPEED 0.055
-#define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W') // TODO: refactor esto, meter en map_utils junto a is_valid_map_char
+#define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W' || (c) == 'O') // TODO: refactor esto, meter en map_utils junto a is_valid_map_char
 
 /* Prototipo de la función centralizada de salida (implementada en main.c) */
 int exit_program(t_cub3d *cub);
@@ -107,17 +107,46 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 		if (drawEnd >= HEIGHT) drawEnd = HEIGHT - 1;
 
 		char cell_hit = cub->map[mapY][mapX];
-        int *current_texture_buffer;
-        int texNum;
-        if (cub->is_bonus && cell_hit == 'D' && cub->door_textures != NULL && cub->door_textures[0] != NULL)
-			current_texture_buffer = cub->door_textures[0];
+		int *current_texture_buffer;
+		int texNum;
+
+		// Correct neighbor logic to check for adjacent open doors ('O')
+		int neighborX = mapX;
+		int neighborY = mapY;
+
+		if (side == 0) // Vertical wall
+		{
+			neighborX = mapX - stepX;
+		}
+		else // Horizontal wall
+		{
+			neighborY = mapY - stepY;
+		}
+
+		int is_door_adjacent = 0;
+		if (cub->is_bonus && neighborY >= 0 && neighborY < cub->map_height &&
+			neighborX >= 0 && neighborX < (int)strlen(cub->map[neighborY]) &&
+			cub->map[neighborY][neighborX] == 'O')
+		{
+			is_door_adjacent = 1;
+		}
+
+		// Texture selection
+		if (cub->is_bonus && cell_hit == 'D' && cub->door_textures != NULL && cub->door_textures[0] != NULL)
+		{
+			current_texture_buffer = cub->door_textures[0]; // Closed door texture
+		}
+		else if (is_door_adjacent)
+		{
+			current_texture_buffer = cub->door_textures[1]; // Open door texture for adjacent walls
+		}
 		else
 		{
-		texNum = get_wall_texture(side, rayDirX, rayDirY);
-		current_texture_buffer = cub->wall_textures[texNum];
+			texNum = get_wall_texture(side, rayDirX, rayDirY);
+			current_texture_buffer = cub->wall_textures[texNum]; // Regular wall texture
 		}
-        
-        double wallX;
+
+		double wallX;
 
 		if (side == 0)
 			wallX = cub->pos_y + perpWallDist * rayDirY;
@@ -149,16 +178,55 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 		{
 			int texY = (int)texPos & (cub->tex_height - 1);
 			texPos += step;
+
 			int color = current_texture_buffer[cub->tex_width * texY + texX];
-            if (side == 1)
-                color = (color >> 1) & 0x7F7F7F;
 			unsigned int *pixel = (unsigned int *)(img_data + (y * size_line + x * bytes_per_pixel));
+			if (side == 1)
+				color = (color >> 1) & 0x7F7F7F;
 			*pixel = (unsigned int)color;
 		}
 	}
 }
 
-// Movimiento y rotación con WASD y flechas, ESC para salir
+void handle_door_action(t_cub3d *cub)
+{
+    // Calculate the map position the player is facing (1.0 unit ahead)
+    int target_mapX = (int)(cub->pos_x + cub->dir_x * 1.0); 
+    int target_mapY = (int)(cub->pos_y + cub->dir_y * 1.0);
+
+    // Check map boundaries
+    if (target_mapY < 0 || target_mapY >= cub->map_height ||
+        target_mapX < 0 || target_mapX >= (int)strlen(cub->map[target_mapY]))
+        return;
+
+    char *target_cell = &cub->map[target_mapY][target_mapX];
+
+    if (cub->is_bonus)
+    {
+        // Case 1: Open a closed door
+        if (*target_cell == 'D')
+        {
+            *target_cell = 'O'; // Open the door
+        }
+        // Case 2: Close an open door
+        else if (*target_cell == 'O')
+        {
+            // Prevent closing the door if the player is inside the door cell
+            int player_mapX = (int)cub->pos_x;
+            int player_mapY = (int)cub->pos_y;
+
+            if (target_mapX == player_mapX && target_mapY == player_mapY)
+            {
+                // Player is inside the door cell, do not close
+                return; 
+            }
+
+            // Close the door
+            *target_cell = 'D';
+        }
+    }
+}
+
 int handle_key_press(int key, t_cub3d *cub)
 {
     if (key == 119) // W
@@ -171,6 +239,8 @@ int handle_key_press(int key, t_cub3d *cub)
         cub->is_rotating_right = 1;
     else if (key == 65307) // ESC
         return (exit_program(cub));
+	else if (key == 49 || key == 32 || key == 65349)
+        handle_door_action(cub);
     return (0);
 }
 
