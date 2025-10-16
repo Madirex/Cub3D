@@ -406,7 +406,8 @@ int render_loop(t_cub3d *cub)
     cub->time_prev = current_time;
     perform_movements(cub);
     raycast_render(cub, cub->img_data, cub->size_line, cub->bpp);
-    draw_minimap(cub, cub->img_data, cub->size_line, cub->bpp);
+    if (cub->is_bonus)
+        draw_minimap(cub, cub->img_data, cub->size_line, cub->bpp);
     mlx_put_image_to_window(cub->mlx, cub->win, cub->img, 0, 0);
     draw_door_prompt(cub);
     return (0);
