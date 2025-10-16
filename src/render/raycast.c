@@ -2,17 +2,7 @@
 #include <mlx.h>
 #include <math.h>
 #include <string.h>
-
-#define WIDTH 640
-#define HEIGHT 480
-#define MOVE_SPEED 0.09
-#define ROT_SPEED 0.055
-#define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W')
-
-#include "../includes/cub3d.h"
-#include <mlx.h>
-#include <math.h>
-#include <string.h>
+#include <sys/time.h>
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -114,56 +104,101 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 		}
 	}
 }
-// El resto de funciones (movimiento, render_loop, init_player) igual que antes
 
 // Movimiento y rotación con WASD y flechas, ESC para salir
-int handle_keys(int key, t_cub3d *cub)
+int handle_key_press(int key, t_cub3d *cub)
 {
-	double oldDirX, oldPlaneX;
-	// W: adelante
-	if (key == 119) {
-		if (IS_FLOOR(cub->map[(int)(cub->pos_y)][(int)(cub->pos_x + cub->dir_x * MOVE_SPEED)]))
-			cub->pos_x += cub->dir_x * MOVE_SPEED;
-		if (IS_FLOOR(cub->map[(int)(cub->pos_y + cub->dir_y * MOVE_SPEED)][(int)(cub->pos_x)]))
-			cub->pos_y += cub->dir_y * MOVE_SPEED;
-	}
-	// S: atrás
-	if (key == 115) {
-		if (IS_FLOOR(cub->map[(int)(cub->pos_y)][(int)(cub->pos_x - cub->dir_x * MOVE_SPEED)]))
-			cub->pos_x -= cub->dir_x * MOVE_SPEED;
-		if (IS_FLOOR(cub->map[(int)(cub->pos_y - cub->dir_y * MOVE_SPEED)][(int)(cub->pos_x)]))
-			cub->pos_y -= cub->dir_y * MOVE_SPEED;
-	}
-	// D o flecha derecha: rotar DERECHA (+ROT_SPEED)
-	if (key == 100 || key == 65363) {
-		oldDirX = cub->dir_x;
-		cub->dir_x = cub->dir_x * cos(ROT_SPEED) - cub->dir_y * sin(ROT_SPEED);
-		cub->dir_y = oldDirX * sin(ROT_SPEED) + cub->dir_y * cos(ROT_SPEED);
-		oldPlaneX = cub->plane_x;
-		cub->plane_x = cub->plane_x * cos(ROT_SPEED) - cub->plane_y * sin(ROT_SPEED);
-		cub->plane_y = oldPlaneX * sin(ROT_SPEED) + cub->plane_y * cos(ROT_SPEED);
-	}
-	// A o flecha izquierda: rotar IZQUIERDA (-ROT_SPEED)
-	if (key == 97 || key == 65361) {
-		oldDirX = cub->dir_x;
-		cub->dir_x = cub->dir_x * cos(-ROT_SPEED) - cub->dir_y * sin(-ROT_SPEED);
-		cub->dir_y = oldDirX * sin(-ROT_SPEED) + cub->dir_y * cos(-ROT_SPEED);
-		oldPlaneX = cub->plane_x;
-		cub->plane_x = cub->plane_x * cos(-ROT_SPEED) - cub->plane_y * sin(-ROT_SPEED);
-		cub->plane_y = oldPlaneX * sin(-ROT_SPEED) + cub->plane_y * cos(-ROT_SPEED);
-	}
-	// ESC: salir
-	if (key == 65307)
-		exit(0);
-	return (0);
+    if (key == 119) // W
+        cub->is_moving_forward = 1;
+    else if (key == 115) // S
+        cub->is_moving_backward = 1;
+    else if (key == 97 || key == 65361) // A o Flecha Izquierda
+        cub->is_rotating_left = 1;
+    else if (key == 100 || key == 65363) // D o Flecha Derecha
+        cub->is_rotating_right = 1;
+    else if (key == 65307) // ESC
+        exit(0);
+    return (0);
+}
+
+int handle_key_release(int key, t_cub3d *cub)
+{
+    if (key == 119) // W
+        cub->is_moving_forward = 0;
+    else if (key == 115) // S
+        cub->is_moving_backward = 0;
+    else if (key == 97 || key == 65361) // A o Flecha Izquierda
+        cub->is_rotating_left = 0;
+    else if (key == 100 || key == 65363) // D o Flecha Derecha
+        cub->is_rotating_right = 0;
+    return (0);
+}
+
+void perform_movements(t_cub3d *cub)
+{
+    double oldDirX, oldPlaneX;
+    double move_speed_dt;
+    double rot_speed_dt;
+
+    move_speed_dt = MOVE_SPEED * cub->time_frame * 60.0;
+    rot_speed_dt = ROT_SPEED * cub->time_frame * 60.0;
+    
+    // Adelante
+    if (cub->is_moving_forward) {
+        if (IS_FLOOR(cub->map[(int)(cub->pos_y)][(int)(cub->pos_x + cub->dir_x * move_speed_dt)]))
+            cub->pos_x += cub->dir_x * move_speed_dt;
+        if (IS_FLOOR(cub->map[(int)(cub->pos_y + cub->dir_y * move_speed_dt)][(int)(cub->pos_x)]))
+            cub->pos_y += cub->dir_y * move_speed_dt;
+    }
+    // Atrás
+    if (cub->is_moving_backward) {
+        if (IS_FLOOR(cub->map[(int)(cub->pos_y)][(int)(cub->pos_x - cub->dir_x * move_speed_dt)]))
+            cub->pos_x -= cub->dir_x * move_speed_dt;
+        if (IS_FLOOR(cub->map[(int)(cub->pos_y - cub->dir_y * move_speed_dt)][(int)(cub->pos_x)]))
+            cub->pos_y -= cub->dir_y * move_speed_dt;
+    }
+    // Rotar Derecha
+    if (cub->is_rotating_right) {
+        oldDirX = cub->dir_x;
+        cub->dir_x = cub->dir_x * cos(rot_speed_dt) - cub->dir_y * sin(rot_speed_dt);
+        cub->dir_y = oldDirX * sin(rot_speed_dt) + cub->dir_y * cos(rot_speed_dt);
+        oldPlaneX = cub->plane_x;
+        cub->plane_x = cub->plane_x * cos(rot_speed_dt) - cub->plane_y * sin(rot_speed_dt);
+        cub->plane_y = oldPlaneX * sin(rot_speed_dt) + cub->plane_y * cos(rot_speed_dt);
+    }
+    // Rotar Izquierda
+    if (cub->is_rotating_left) {
+        oldDirX = cub->dir_x;
+        cub->dir_x = cub->dir_x * cos(-rot_speed_dt) - cub->dir_y * sin(-rot_speed_dt);
+        cub->dir_y = oldDirX * sin(-rot_speed_dt) + cub->dir_y * cos(-rot_speed_dt);
+        oldPlaneX = cub->plane_x;
+        cub->plane_x = cub->plane_x * cos(-rot_speed_dt) - cub->plane_y * sin(-rot_speed_dt);
+        cub->plane_y = oldPlaneX * sin(-rot_speed_dt) + cub->plane_y * cos(-rot_speed_dt);
+    }
+}
+
+long fn_get_time_in_ms(void)
+{
+    struct timeval tv;
+    
+    if (gettimeofday(&tv, NULL) == -1)
+        return (0);
+        
+    return ((long)(tv.tv_sec * 1000 + tv.tv_usec / 1000));
 }
 
 // Bucle de renderizado
 int render_loop(t_cub3d *cub)
 {
-	raycast_render(cub, cub->img_data, cub->size_line, cub->bpp);
-	mlx_put_image_to_window(cub->mlx, cub->win, cub->img, 0, 0);
-	return (0);
+    long current_time;
+
+    current_time = fn_get_time_in_ms();
+    cub->time_frame = (current_time - cub->time_prev) / 1000.0; 
+    cub->time_prev = current_time;
+    perform_movements(cub);
+    raycast_render(cub, cub->img_data, cub->size_line, cub->bpp);
+    mlx_put_image_to_window(cub->mlx, cub->win, cub->img, 0, 0);
+    return (0);
 }
 
 // Inicializa la posición/dirección del jugador según el mapa

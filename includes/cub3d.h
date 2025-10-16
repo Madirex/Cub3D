@@ -76,6 +76,11 @@ typedef struct s_cub3d
     int			tex_height;
 
 	// --- Añadidos para raycasting y MLX ---
+	int			is_moving_forward;
+    int			is_moving_backward;
+    int			is_rotating_left;
+    int			is_rotating_right;
+	
 	double		pos_x;      // Posición real X (con decimales)
 	double		pos_y;      // Posición real Y
 	double		dir_x;      // Dirección del jugador X
@@ -90,6 +95,11 @@ typedef struct s_cub3d
 	int			bpp;        // Bits por píxel
 	int			size_line;  // Bytes por línea de la imagen
 	int			endian;     // Endianess de la imagen
+
+	// Delta Time
+	double  time_frame;
+	long    time_prev;
+
 }	t_cub3d;
 
 /**

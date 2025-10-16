@@ -52,7 +52,8 @@
 
 // Prototipos de funciones implementadas en raycast.c
 void	init_player(t_cub3d *cub);
-int		handle_keys(int key, t_cub3d *cub);
+int		handle_key_press(int key, t_cub3d *cub);
+int		handle_key_release(int key, t_cub3d *cub);
 int		render_loop(t_cub3d *cub);
 
 // Prototipos de funciones de parseo y validación del repo
@@ -93,7 +94,8 @@ int main(int argc, char *argv[]) {
 	load_wall_textures(&cub, mlx);
 
 	// Hooks y bucle principal igual que antes
-	mlx_hook(win, 2, 1L<<0, handle_keys, &cub);
+	mlx_hook(cub.win, 2, 1L<<0, handle_key_press, &cub);
+	mlx_hook(cub.win, 3, 1L<<1, handle_key_release, &cub);
 	mlx_loop_hook(mlx, render_loop, &cub);
 	mlx_loop(mlx);
 
