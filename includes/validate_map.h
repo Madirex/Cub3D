@@ -24,5 +24,7 @@
 # include "cub3d.h"
 
 void	validate_map(t_cub3d *cub);
+void init_cub3d(t_cub3d *cub);
+void validate_textures(t_cub3d *cub);
 
 #endif

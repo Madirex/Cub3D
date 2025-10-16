@@ -29,12 +29,13 @@
 #include "../includes/map_utils.h"
 #include "../includes/validate_map.h"
 #include "../includes/utils.h"
-
-void	assign_texture(t_cub3d *cub, char *line);
-int		validate_file_extension(char *filename);
-void	validate_textures(t_cub3d *cub);
-void	init_cub3d(t_cub3d *cub);
-void	read_map(int fd, t_cub3d *cub);
+#include	 <string.h>
+#include <mlx.h>
+// void	assign_texture(t_cub3d *cub, char *line);
+// int		validate_file_extension(char *filename);
+// void	validate_textures(t_cub3d *cub);
+// void	init_cub3d(t_cub3d *cub);
+// void	read_map(int fd, t_cub3d *cub);
 
 /**
  * @brief Main entry point of the Cub3D program
@@ -46,28 +47,57 @@ void	read_map(int fd, t_cub3d *cub);
  * @param argv Array of command line arguments
  * @return 0 on success, 1 on error
  */
-int	main(int argc, char *argv[])
-{
-	int		fd;
-	t_cub3d	cub;
+#define WIDTH 640
+#define HEIGHT 480
+
+// Prototipos de funciones implementadas en raycast.c
+void	init_player(t_cub3d *cub);
+int		handle_keys(int key, t_cub3d *cub);
+int		render_loop(t_cub3d *cub);
+
+// Prototipos de funciones de parseo y validación del repo
+void	assign_map(t_cub3d *cub, char *filename);
+void	validate_map(t_cub3d *cub);
+
+int main(int argc, char *argv[]) {
+	(void)argc;
+	int fd;
+	t_cub3d cub;
+	void *mlx, *win, *img;
+	char *img_data;
+	int bpp, size_line, endian;
 
 	init_cub3d(&cub);
-	if (argc != 2)
-	{
-		fprintf(stderr, "Use: %s <map.cub>\n", argv[0]);
-		return (1);
-	}
-	if (!validate_file_extension(argv[1]))
-		ft_error("Invalid file extension. Please use a .cub file", NULL, NULL);
+	// ... argumentos, validaciones, parsing ...
 	fd = open(argv[1], O_RDONLY);
-	if (fd < 0)
-		ft_error("Cannot open file", NULL, NULL);
 	read_map(fd, &cub);
 	close(fd);
 	validate_textures(&cub);
 	assign_map(&cub, argv[1]);
 	validate_map(&cub);
-	print_map_debug(&cub);
+	init_player(&cub);
+
+	mlx = mlx_init();
+	win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
+	img = mlx_new_image(mlx, WIDTH, HEIGHT);
+	img_data = mlx_get_data_addr(img, &bpp, &size_line, &endian);
+
+	cub.mlx = mlx;
+	cub.win = win;
+	cub.img = img;
+	cub.img_data = img_data;
+	cub.bpp = bpp;
+	cub.size_line = size_line;
+	cub.endian = endian;
+
+	load_wall_textures(&cub, mlx);
+
+	// Hooks y bucle principal igual que antes
+	mlx_hook(win, 2, 1L<<0, handle_keys, &cub);
+	mlx_loop_hook(mlx, render_loop, &cub);
+	mlx_loop(mlx);
+
+	// Liberar texturas/mapa al salir
 	free_textures(&cub.textures);
 	if (cub.map)
 		free_map(cub.map, cub.map_height);
