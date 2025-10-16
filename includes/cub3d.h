@@ -50,6 +50,8 @@ typedef struct s_textures
 	char	*so;		/**< South wall texture path */
 	char	*we;		/**< West wall texture path */
 	char	*ea;		/**< East wall texture path */
+	char    *door_closed;
+	char    *door_open;
 	t_rgb	floor;		/**< Floor color in RGB */
 	t_rgb	ceiling;	/**< Ceiling color in RGB */
 }	t_textures;
