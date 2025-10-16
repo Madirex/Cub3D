@@ -65,7 +65,7 @@ void	raycast_render(t_cub3d *cub, char *img_data, int size_line, int bpp)
 			if (mapY < 0 || mapY >= cub->map_height || mapX < 0 || mapX >= (int)strlen(cub->map[mapY]))
 				break;
 			char cell = cub->map[mapY][mapX];
-			if (cell && cell != '0' && cell != ' ')
+			if (cell == '1')
 				hit = 1;
 		}
 		if (!hit) continue;
