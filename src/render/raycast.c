@@ -8,6 +8,7 @@
 #define HEIGHT 960
 #define MOVE_SPEED 0.09
 #define ROT_SPEED 0.055
+#define MOUSE_SENSITIVITY 0.003
 #define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' || (c) == 'E' || (c) == 'W' || (c) == 'O') // TODO: refactor esto, meter en map_utils junto a is_valid_map_char
 
 #define MINIMAP_SCALE 12         // Size of each map cell in pixels
@@ -482,4 +483,32 @@ void	init_player(t_cub3d *cub)
 			return;
 		}
 	}
+}
+
+void	rotate_player(t_cub3d *cub, double angle)
+{
+	double	old_dir_x;
+	double	old_plane_x;
+
+	old_dir_x = cub->dir_x;
+	cub->dir_x = cub->dir_x * cos(angle) - cub->dir_y * sin(angle);
+	cub->dir_y = old_dir_x * sin(angle) + cub->dir_y * cos(angle);
+	old_plane_x = cub->plane_x;
+	cub->plane_x = cub->plane_x * cos(angle) - cub->plane_y * sin(angle);
+	cub->plane_y = old_plane_x * sin(angle) + cub->plane_y * cos(angle);
+}
+
+int	handle_mouse_move(int x, int y, t_cub3d *cub)
+{
+	int		delta_x;
+	double	rotation_angle;
+
+	(void)y;
+	delta_x = x - (WIDTH / 2);
+	if (delta_x == 0)
+		return (0);
+	rotation_angle = delta_x * MOUSE_SENSITIVITY;
+	rotate_player(cub, rotation_angle);
+	mlx_mouse_move(cub->mlx, cub->win, WIDTH / 2, HEIGHT / 2);
+	return (0);
 }

@@ -41,6 +41,7 @@ void	init_player(t_cub3d *cub);
 int		handle_key_press(int key, t_cub3d *cub);
 int		handle_key_release(int key, t_cub3d *cub);
 int		render_loop(t_cub3d *cub);
+int		handle_mouse_move(int x, int y, t_cub3d *cub);
 
 // Prototipos de funciones de parseo y validación del repo
 void	assign_map(t_cub3d *cub, char *filename);
@@ -104,9 +105,12 @@ int	main(int argc, char *argv[])
 	cub.size_line = size_line;
 	cub.endian = endian;
 	load_wall_textures(&cub, mlx);
+	cub.last_mouse_x = WIDTH / 2;
+	mlx_mouse_hide(cub.mlx, cub.win);
 	mlx_hook(cub.win, 2, 1L << 0, handle_key_press, &cub);
 	mlx_hook(cub.win, 3, 1L << 1, handle_key_release, &cub);
 	mlx_hook(cub.win, 17, 0, exit_program, &cub);
+	mlx_hook(cub.win, 6, 1L << 6, handle_mouse_move, &cub);
 	mlx_loop_hook(mlx, render_loop, &cub);
 	mlx_loop(mlx);
 	free_textures(&cub.textures);

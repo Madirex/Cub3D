@@ -104,6 +104,9 @@ typedef struct s_cub3d
 	double  time_frame;
 	long    time_prev;
 
+	// Mouse rotation
+	int		last_mouse_x;
+
 }	t_cub3d;
 
 /**
