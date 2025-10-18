@@ -64,25 +64,21 @@ static void	expand_temp_map_if_needed(
 }
 
 /**
- * @brief Trims a map line or exits on memory allocation failure
- * 
- * @param cub Pointer to the main Cub3D structure
- * @param ctx Pointer to the map parsing context
- * @param line The line to trim
- * @return Trimmed line or exits on failure
+ * @brief Removes newline and carriage return characters from the end of a string.
  */
-static char	*trim_map_line_or_exit(
-		t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
+static char *trim_newline_chars(char *str)
 {
-	char	*trimmed_line;
+	int len;
 
-	trimmed_line = ft_strtrim(line, " \t\n\r");
-	if (!trimmed_line)
+	if (!str)
+		return (NULL);
+	len = ft_strlen(str);
+	while (len > 0 && (str[len - 1] == '\n' || str[len - 1] == '\r'))
 	{
-		free_map(ctx->temp_map, ctx->map_lines);
-		ft_error("Memory allocation failed for map line trimming", cub, line);
+		str[len - 1] = '\0';
+		len--;
 	}
-	return (trimmed_line);
+	return (str);
 }
 
 /**
@@ -97,13 +93,12 @@ static char	*trim_map_line_or_exit(
  */
 static void	handle_map_line(t_cub3d *cub, t_map_parse_ctx *ctx, char *line)
 {
-	char	*trimmed_line;
-	int		len;
+	int	len;
 
 	expand_temp_map_if_needed(cub, ctx, line);
-	trimmed_line = trim_map_line_or_exit(cub, ctx, line);
-	ctx->temp_map[ctx->map_lines] = trimmed_line;
-	len = (int)ft_strlen(trimmed_line);
+	trim_newline_chars(line);
+	ctx->temp_map[ctx->map_lines] = line;
+	len = (int)ft_strlen(line);
 	if (len > cub->map_width)
 		cub->map_width = len;
 	ctx->map_lines++;
@@ -175,7 +170,8 @@ void	process_map_lines(t_cub3d *cub, int fd, t_map_parse_ctx *ctx)
 		}
 		else if (reading_map && !is_whitespace_only(line))
 			ft_error("Invalid character found in map", cub, line);
-		free(line);
+		else
+			free(line);
 		line = read_line(fd);
 	}
 }

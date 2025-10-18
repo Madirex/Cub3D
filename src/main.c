@@ -91,6 +91,7 @@ int	main(int argc, char *argv[])
 	assign_map(&cub, argv[1]);
 	validate_map(&cub);
 	init_player(&cub);
+	print_map_debug(&cub);
 	mlx = mlx_init();
 	win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
 	img = mlx_new_image(mlx, WIDTH, HEIGHT);
