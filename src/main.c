@@ -36,30 +36,19 @@
 #define HEIGHT 960
 #define IS_BONUS 1
 
-// Prototipos de funciones implementadas en raycast.c
 void	init_player(t_cub3d *cub);
 int		handle_key_press(int key, t_cub3d *cub);
 int		handle_key_release(int key, t_cub3d *cub);
 int		render_loop(t_cub3d *cub);
 int		handle_mouse_move(int x, int y, t_cub3d *cub);
-
-// Prototipos de funciones de parseo y validación del repo
 void	assign_map(t_cub3d *cub, char *filename);
 void	validate_map(t_cub3d *cub);
 
 /**
- * @brief Main entry point of the Cub3D program
- * 
- * Handles command line arguments, file validation, parsing,
- * and cleanup of resources.
- * 
- * @param argc Number of command line arguments
- * @param argv Array of command line arguments
- * @return 0 on success, 1 on error
+ * @brief Cleans up resources and exits the program
+ * * @param cub Pointer to the main Cub3D structure
+ * @return 0 (never returns, exits the program)
  */
-
-/* Funcion de salida y limpieza del programa */
-
 int	exit_program(t_cub3d *cub)
 {
 	if (!cub)
@@ -75,46 +64,79 @@ int	exit_program(t_cub3d *cub)
 	return (0);
 }
 
+int open_and_parse_map(t_cub3d *cub, char *map_path)
+{
+    int fd;
+
+    fd = open(map_path, O_RDONLY);
+    read_map(fd, cub);
+    validate_textures(cub);
+    assign_map(cub, map_path);
+    validate_map(cub);
+    init_player(cub);
+    print_map_debug(cub);
+    return (fd);
+}
+
+void init_mlx_and_game(t_cub3d *cub)
+{
+    void    *mlx;
+    void    *win;
+    void    *img;
+    char    *img_data;
+    int     bpp;
+    int     size_line;
+    int     endian;
+
+    mlx = mlx_init();
+    win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
+    img = mlx_new_image(mlx, WIDTH, HEIGHT);
+    img_data = mlx_get_data_addr(img, &bpp, &size_line, &endian);
+
+    cub->mlx = mlx;
+    cub->win = win;
+    cub->img = img;
+    cub->img_data = img_data;
+    cub->bpp = bpp;
+    cub->size_line = size_line;
+    cub->endian = endian;
+
+    load_wall_textures(cub, mlx);
+    cub->last_mouse_x = WIDTH / 2;
+    mlx_mouse_hide(cub->mlx, cub->win);
+}
+
+void setup_hooks_and_run(t_cub3d *cub)
+{
+    mlx_hook(cub->win, 2, 1L << 0, handle_key_press, cub);
+    mlx_hook(cub->win, 3, 1L << 1, handle_key_release, cub);
+    mlx_hook(cub->win, 17, 0, exit_program, cub);
+    mlx_hook(cub->win, 6, 1L << 6, handle_mouse_move, cub);
+    
+    mlx_loop_hook(cub->mlx, render_loop, cub);
+    mlx_loop(cub->mlx);
+}
+
+void free_game_resources(t_cub3d *cub)
+{
+	free_textures(&cub->textures);
+	if (cub->map)
+		free_map(cub->map, cub->map_height);
+}
+
 int	main(int argc, char *argv[])
 {
-	(void)	argc;
-	int		fd;
-	t_cub3d	cub;
-	void	*mlx, *win, *img;
-	char	*img_data;
-	int		bpp, size_line, endian;
+	int			fd;
+	t_cub3d		cub;
 
+	if (argc != 2)
+		return (1);
+	(void) argc;
 	init_cub3d(&cub, IS_BONUS);
-	fd = open(argv[1], O_RDONLY);
-	read_map(fd, &cub);
+	fd = open_and_parse_map(&cub, argv[1]);
 	close(fd);
-	validate_textures(&cub);
-	assign_map(&cub, argv[1]);
-	validate_map(&cub);
-	init_player(&cub);
-	print_map_debug(&cub);
-	mlx = mlx_init();
-	win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
-	img = mlx_new_image(mlx, WIDTH, HEIGHT);
-	img_data = mlx_get_data_addr(img, &bpp, &size_line, &endian);
-	cub.mlx = mlx;
-	cub.win = win;
-	cub.img = img;
-	cub.img_data = img_data;
-	cub.bpp = bpp;
-	cub.size_line = size_line;
-	cub.endian = endian;
-	load_wall_textures(&cub, mlx);
-	cub.last_mouse_x = WIDTH / 2;
-	mlx_mouse_hide(cub.mlx, cub.win);
-	mlx_hook(cub.win, 2, 1L << 0, handle_key_press, &cub);
-	mlx_hook(cub.win, 3, 1L << 1, handle_key_release, &cub);
-	mlx_hook(cub.win, 17, 0, exit_program, &cub);
-	mlx_hook(cub.win, 6, 1L << 6, handle_mouse_move, &cub);
-	mlx_loop_hook(mlx, render_loop, &cub);
-	mlx_loop(mlx);
-	free_textures(&cub.textures);
-	if (cub.map)
-		free_map(cub.map, cub.map_height);
+	init_mlx_and_game(&cub);
+	setup_hooks_and_run(&cub);
+	free_game_resources(&cub);
 	return (0);
 }
