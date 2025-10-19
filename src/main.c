@@ -64,60 +64,74 @@ int	exit_program(t_cub3d *cub)
 	return (0);
 }
 
-int open_and_parse_map(t_cub3d *cub, char *map_path)
+int	open_and_parse_map(t_cub3d *cub, char *map_path)
 {
-    int fd;
+	int	fd;
 
-    fd = open(map_path, O_RDONLY);
-    read_map(fd, cub);
-    validate_textures(cub);
-    assign_map(cub, map_path);
-    validate_map(cub);
-    init_player(cub);
-    print_map_debug(cub);
-    return (fd);
+	fd = open(map_path, O_RDONLY);
+	read_map(fd, cub);
+	validate_textures(cub);
+	assign_map(cub, map_path);
+	validate_map(cub);
+	init_player(cub);
+	print_map_debug(cub);
+	return (fd);
 }
 
-void init_mlx_and_game(t_cub3d *cub)
+void	get_image_data(t_cub3d *cub)
 {
-    void    *mlx;
-    void    *win;
-    void    *img;
-    char    *img_data;
-    int     bpp;
-    int     size_line;
-    int     endian;
+	char	*img_data;
+	int		bpp;
+	int		size_line;
+	int		endian;
 
-    mlx = mlx_init();
-    win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
-    img = mlx_new_image(mlx, WIDTH, HEIGHT);
-    img_data = mlx_get_data_addr(img, &bpp, &size_line, &endian);
-
-    cub->mlx = mlx;
-    cub->win = win;
-    cub->img = img;
-    cub->img_data = img_data;
-    cub->bpp = bpp;
-    cub->size_line = size_line;
-    cub->endian = endian;
-
-    load_wall_textures(cub, mlx);
-    cub->last_mouse_x = WIDTH / 2;
-    mlx_mouse_hide(cub->mlx, cub->win);
+	img_data = mlx_get_data_addr(cub->img, &bpp, &size_line, &endian);
+	cub->img_data = img_data;
+	cub->bpp = bpp;
+	cub->size_line = size_line;
+	cub->endian = endian;
 }
 
-void setup_hooks_and_run(t_cub3d *cub)
+void	setup_graphics_and_mouse(t_cub3d *cub)
 {
-    mlx_hook(cub->win, 2, 1L << 0, handle_key_press, cub);
-    mlx_hook(cub->win, 3, 1L << 1, handle_key_release, cub);
-    mlx_hook(cub->win, 17, 0, exit_program, cub);
-    mlx_hook(cub->win, 6, 1L << 6, handle_mouse_move, cub);
-    
-    mlx_loop_hook(cub->mlx, render_loop, cub);
-    mlx_loop(cub->mlx);
+	load_wall_textures(cub, cub->mlx);
+	cub->last_mouse_x = WIDTH / 2;
+	mlx_mouse_hide(cub->mlx, cub->win);
 }
 
-void free_game_resources(t_cub3d *cub)
+void	init_mlx_pointers(t_cub3d *cub, void *mlx)
+{
+	void	*win;
+	void	*img;
+
+	cub->mlx = mlx;
+	win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
+	img = mlx_new_image(mlx, WIDTH, HEIGHT);
+	cub->win = win;
+	cub->img = img;
+}
+
+void	init_mlx_and_game(t_cub3d *cub)
+{
+	void	*mlx;
+
+	mlx = mlx_init();
+	init_mlx_pointers(cub, mlx);
+	get_image_data(cub);
+	setup_graphics_and_mouse(cub);
+}
+
+void	setup_hooks_and_run(t_cub3d *cub)
+{
+	mlx_hook(cub->win, 2, 1L << 0, handle_key_press, cub);
+	mlx_hook(cub->win, 3, 1L << 1, handle_key_release, cub);
+	mlx_hook(cub->win, 17, 0, exit_program, cub);
+	mlx_hook(cub->win, 6, 1L << 6, handle_mouse_move, cub);
+	mlx_loop_hook(cub->mlx, render_loop, cub);
+	mlx_loop(cub->mlx);
+}
+
+void	free_game_resources(t_cub3d *cub)
 {
 	free_textures(&cub->textures);
 	if (cub->map)
