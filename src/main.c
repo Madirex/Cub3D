@@ -43,27 +43,18 @@ int		render_loop(t_cub3d *cub);
 int		handle_mouse_move(int x, int y, t_cub3d *cub);
 void	assign_map(t_cub3d *cub, char *filename);
 void	validate_map(t_cub3d *cub);
+void	safe_exit(t_cub3d *cub, char *line, int exit_code);
 
 /**
- * @brief Cleans up resources and exits the program
- * * @param cub Pointer to the main Cub3D structure
- * @return 0 (never returns, exits the program)
+ * @brief Opens and parses the map file
+ * 
+ * Opens the specified map file, reads and validates
+ * its contents, and initializes the player position.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param map_path Path to the map file
+ * @return File descriptor of the opened map file
  */
-int	exit_program(t_cub3d *cub)
-{
-	if (!cub)
-		exit(0);
-	if (cub->img && cub->mlx)
-		mlx_destroy_image(cub->mlx, cub->img);
-	if (cub->win && cub->mlx)
-		mlx_destroy_window(cub->mlx, cub->win);
-	free_textures(&cub->textures);
-	if (cub->map)
-		free_map(cub->map, cub->map_height);
-	exit(0);
-	return (0);
-}
-
 int	open_and_parse_map(t_cub3d *cub, char *map_path)
 {
 	int	fd;
@@ -78,6 +69,14 @@ int	open_and_parse_map(t_cub3d *cub, char *map_path)
 	return (fd);
 }
 
+/**
+ * @brief Retrieves image data from the MLX image
+ * 
+ * Populates the Cub3D structure with image data pointers
+ * and properties such as bits per pixel, size line, and endianess.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ */
 void	get_image_data(t_cub3d *cub)
 {
 	char	*img_data;
@@ -92,13 +91,15 @@ void	get_image_data(t_cub3d *cub)
 	cub->endian = endian;
 }
 
-void	setup_graphics_and_mouse(t_cub3d *cub)
-{
-	load_wall_textures(cub, cub->mlx);
-	cub->last_mouse_x = WIDTH / 2;
-	mlx_mouse_hide(cub->mlx, cub->win);
-}
-
+/**
+ * @brief Initializes MLX pointers for window and image
+ * 
+ * Sets up the MLX instance, creates a new window,
+ * and initializes the image buffer.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param mlx Pointer to the MLX instance
+ */
 void	init_mlx_pointers(t_cub3d *cub, void *mlx)
 {
 	void	*win;
@@ -111,16 +112,14 @@ void	init_mlx_pointers(t_cub3d *cub, void *mlx)
 	cub->img = img;
 }
 
-void	init_mlx_and_game(t_cub3d *cub)
-{
-	void	*mlx;
-
-	mlx = mlx_init();
-	init_mlx_pointers(cub, mlx);
-	get_image_data(cub);
-	setup_graphics_and_mouse(cub);
-}
-
+/**
+ * @brief Sets up event hooks and starts the main loop
+ * 
+ * Configures key press/release, window close, mouse movement,
+ * and rendering loop hooks, then enters the MLX main loop.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ */
 void	setup_hooks_and_run(t_cub3d *cub)
 {
 	mlx_hook(cub->win, 2, 1L << 0, handle_key_press, cub);
@@ -131,17 +130,17 @@ void	setup_hooks_and_run(t_cub3d *cub)
 	mlx_loop(cub->mlx);
 }
 
-void	free_game_resources(t_cub3d *cub)
-{
-	free_textures(&cub->textures);
-	if (cub->map)
-		free_map(cub->map, cub->map_height);
-}
-
+/**
+ * @brief Main entry point for the Cub3D application
+ * @param argc Argument count
+ * @param argv Argument vector
+ * @return Exit status
+ */
 int	main(int argc, char *argv[])
 {
 	int			fd;
 	t_cub3d		cub;
+	void		*mlx;
 
 	if (argc != 2)
 		return (1);
@@ -149,8 +148,13 @@ int	main(int argc, char *argv[])
 	init_cub3d(&cub, IS_BONUS);
 	fd = open_and_parse_map(&cub, argv[1]);
 	close(fd);
-	init_mlx_and_game(&cub);
+	mlx = mlx_init();
+	init_mlx_pointers(&cub, mlx);
+	get_image_data(&cub);
+	load_wall_textures(&cub, cub.mlx);
+	cub.last_mouse_x = WIDTH / 2;
+	mlx_mouse_hide(cub.mlx, cub.win);
 	setup_hooks_and_run(&cub);
-	free_game_resources(&cub);
+	safe_exit(&cub, NULL, 0);
 	return (0);
 }
