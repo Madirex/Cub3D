@@ -185,7 +185,7 @@ void	validate_map(t_cub3d *cub)
 	if (!cub->map || cub->map_height == 0)
 		ft_error("No map found", cub, NULL);
 	find_player_position(cub);
-	validate_doors(cub); // Validate doors before flood fill
+	validate_doors(cub);
 	visited = (int **)malloc(sizeof(int *) * cub->map_height);
 	if (!visited)
 		ft_error("Memory allocation failed for map validation", cub, NULL);
