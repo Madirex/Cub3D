@@ -34,7 +34,7 @@
 
 #define WIDTH 1248
 #define HEIGHT 960
-#define IS_BONUS 1
+#define IS_BONUS 0
 
 void	init_player(t_cub3d *cub);
 int		handle_key_press(int key, t_cub3d *cub);
@@ -125,7 +125,8 @@ void	setup_hooks_and_run(t_cub3d *cub)
 	mlx_hook(cub->win, 2, 1L << 0, handle_key_press, cub);
 	mlx_hook(cub->win, 3, 1L << 1, handle_key_release, cub);
 	mlx_hook(cub->win, 17, 0, exit_program, cub);
-	mlx_hook(cub->win, 6, 1L << 6, handle_mouse_move, cub);
+	if (cub->is_bonus)
+		mlx_hook(cub->win, 6, 1L << 6, handle_mouse_move, cub);
 	mlx_loop_hook(cub->mlx, render_loop, cub);
 	mlx_loop(cub->mlx);
 }
@@ -153,7 +154,8 @@ int	main(int argc, char *argv[])
 	get_image_data(&cub);
 	load_wall_textures(&cub, cub.mlx);
 	cub.last_mouse_x = WIDTH / 2;
-	mlx_mouse_hide(cub.mlx, cub.win);
+	if (cub.is_bonus)
+		mlx_mouse_hide(cub.mlx, cub.win);
 	setup_hooks_and_run(&cub);
 	safe_exit(&cub, NULL, 0);
 	return (0);
