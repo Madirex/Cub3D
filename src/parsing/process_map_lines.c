@@ -64,11 +64,12 @@ static void	expand_temp_map_if_needed(
 }
 
 /**
- * @brief Removes newline and carriage return characters from the end of a string.
+ * @brief Removes newline and carriage return characters
+ * from the end of a string.
  */
-static char *trim_newline_chars(char *str)
+static char	*trim_newline_chars(char *str)
 {
-	int len;
+	int	len;
 
 	if (!str)
 		return (NULL);
