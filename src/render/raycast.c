@@ -498,17 +498,17 @@ void	rotate_player(t_cub3d *cub, double angle)
 	cub->plane_y = old_plane_x * sin(angle) + cub->plane_y * cos(angle);
 }
 
-int	handle_mouse_move(int x, int y, t_cub3d *cub)
+int handle_mouse_move(int x, int y, t_cub3d *cub)
 {
-	int		delta_x;
-	double	rotation_angle;
+    int         delta_x;
+    double      rotation_angle;
 
-	(void)y;
-	delta_x = x - (WIDTH / 2);
-	if (delta_x == 0)
-		return (0);
-	rotation_angle = delta_x * MOUSE_SENSITIVITY;
-	rotate_player(cub, rotation_angle);
-	mlx_mouse_move(cub->mlx, cub->win, WIDTH / 2, HEIGHT / 2);
-	return (0);
+    (void)y;
+    delta_x = x - cub->last_mouse_x; 
+    if (delta_x == 0)
+        return (0);
+    rotation_angle = delta_x * MOUSE_SENSITIVITY;
+    rotate_player(cub, rotation_angle);
+    cub->last_mouse_x = x; 
+    return (0);
 }
