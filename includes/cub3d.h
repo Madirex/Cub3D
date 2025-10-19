@@ -50,8 +50,8 @@ typedef struct s_textures
 	char	*so;		/**< South wall texture path */
 	char	*we;		/**< West wall texture path */
 	char	*ea;		/**< East wall texture path */
-	char    *door_closed;
-	char    *door_open;
+	char	*door_closed;
+	char	*door_open;
 	t_rgb	floor;		/**< Floor color in RGB */
 	t_rgb	ceiling;	/**< Ceiling color in RGB */
 }	t_textures;
@@ -72,41 +72,34 @@ typedef struct s_cub3d
 	int			player_x;	/**< Player X position on map */
 	int			player_y;	/**< Player Y position on map */
 	char		player_dir;	/**< Player initial direction (N/S/E/W) */
-
 	int			**wall_textures; // [4][tex_width*tex_height]
-	int         **door_textures; // [1][tex_width*tex_height]
-    int			tex_width;
-    int			tex_height;
+	int			**door_textures; // [1][tex_width*tex_height]
+	int			tex_width;
+	int			tex_height;
 	int			is_bonus;
-
 	// --- Añadidos para raycasting y MLX ---
 	int			is_moving_forward;
-    int			is_moving_backward;
-    int			is_rotating_left;
-    int			is_rotating_right;
-	
-	double		pos_x;      // Posición real X (con decimales)
-	double		pos_y;      // Posición real Y
-	double		dir_x;      // Dirección del jugador X
-	double		dir_y;      // Dirección del jugador Y
-	double		plane_x;    // Plano de cámara X
-	double		plane_y;    // Plano de cámara Y
-
-	void		*mlx;       // Puntero a la instancia MLX
-	void		*win;       // Puntero a la ventana MLX
-	void		*img;       // Imagen para dibujar
-	char		*img_data;  // Buffer de datos de píxel de la imagen
-	int			bpp;        // Bits por píxel
-	int			size_line;  // Bytes por línea de la imagen
-	int			endian;     // Endianess de la imagen
-
+	int			is_moving_backward;
+	int			is_rotating_left;
+	int			is_rotating_right;
+	double		pos_x;		// Posición real X (con decimales)
+	double		pos_y;		// Posición real Y
+	double		dir_x;		// Dirección del jugador X
+	double		dir_y;		// Dirección del jugador Y
+	double		plane_x;	// Plano de cámara X
+	double		plane_y;	// Plano de cámara Y
+	void		*mlx;		// Puntero a la instancia MLX
+	void		*win;		// Puntero a la ventana MLX
+	void		*img;		// Imagen para dibujar
+	char		*img_data;	// Buffer de datos de píxel de la imagen
+	int			bpp;		// Bits por píxel
+	int			size_line;	// Bytes por línea de la imagen
+	int			endian;		// Endianess de la imagen
 	// Delta Time
-	double  time_frame;
-	long    time_prev;
-
+	double		time_frame;
+	long		time_prev;
 	// Mouse rotation
-	int		last_mouse_x;
-
+	int			last_mouse_x;
 }	t_cub3d;
 
 /**
@@ -126,6 +119,10 @@ typedef struct s_readmap_ctx
 	int		stop;	/**< Stop flag */
 }	t_readmap_ctx;
 
-int	exit_program(t_cub3d *cub);
+int		exit_program(t_cub3d *cub);
+int		open_and_parse_map(t_cub3d *cub, char *map_path);
+void	init_mlx_and_game(t_cub3d *cub);
+void	setup_hooks_and_run(t_cub3d *cub);
+void	free_game_resources(t_cub3d *cub);
 
 #endif
