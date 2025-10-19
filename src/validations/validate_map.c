@@ -110,7 +110,8 @@ static int	is_valid_position(t_cub3d *cub, int x, int y)
  * @brief Validates if a door ('D') at (x, y) is correctly enclosed.
  *
  * A door must be surrounded by '1' (walls) or map boundaries,
- * allowing '0', 'N', 'S', 'E', 'W', or ' ' only on two opposing sides (horizontally or vertically).
+ * allowing '0', 'N', 'S', 'E', 'W', or ' '
+ * only on two opposing sides (horizontally or vertically).
  *
  * @param cub Pointer to the main Cub3D structure.
  * @param x X coordinate of the door.
@@ -121,27 +122,41 @@ static void	validate_door_enclosure(t_cub3d *cub, int x, int y)
 	int	is_horizontal_gap;
 	int	is_vertical_gap;
 
-	is_horizontal_gap = (is_valid_position(cub, x - 1, y) && ft_strchr("0NSEW ", cub->map[y][x - 1]))
-						&& (is_valid_position(cub, x + 1, y) && ft_strchr("0NSEW ", cub->map[y][x + 1]));
-	is_vertical_gap = (is_valid_position(cub, x, y - 1) && ft_strchr("0NSEW ", cub->map[y - 1][x]))
-					  && (is_valid_position(cub, x, y + 1) && ft_strchr("0NSEW ", cub->map[y + 1][x]));
-
+	is_horizontal_gap = (is_valid_position(cub, x - 1, y)
+			&& ft_strchr("0NSEW ", cub->map[y][x - 1]))
+		&& (is_valid_position(cub, x + 1, y)
+			&& ft_strchr("0NSEW ", cub->map[y][x + 1]));
+	is_vertical_gap = (is_valid_position(cub, x, y - 1)
+			&& ft_strchr("0NSEW ", cub->map[y - 1][x]))
+		&& (is_valid_position(cub, x, y + 1)
+			&& ft_strchr("0NSEW ", cub->map[y + 1][x]));
 	if (!(is_horizontal_gap ^ is_vertical_gap))
-		ft_error("Door is not properly enclosed by walls (must be exclusively horizontal OR vertical opening)", cub, NULL);
-
+		ft_error("Door is not properly enclosed by walls", cub, NULL);
 	if (is_horizontal_gap)
 	{
-		if (is_valid_position(cub, x, y - 1) && cub->map[y - 1][x] != '1' && cub->map[y - 1][x] != ' ')
-			ft_error("Door must have a wall or space above it for horizontal opening", cub, NULL);
-		if (is_valid_position(cub, x, y + 1) && cub->map[y + 1][x] != '1' && cub->map[y + 1][x] != ' ')
-			ft_error("Door must have a wall or space below it for horizontal opening", cub, NULL);
+		if (is_valid_position(cub, x, y - 1) && cub->map[y - 1][x] != '1'
+			&& cub->map[y - 1][x] != ' ')
+			ft_error(
+				"Door must have a wall/space above it for horizontal opening",
+				cub, NULL);
+		if (is_valid_position(cub, x, y + 1) && cub->map[y + 1][x] != '1'
+			&& cub->map[y + 1][x] != ' ')
+			ft_error(
+				"Door must have a wall/space below it for horizontal opening",
+				cub, NULL);
 	}
 	else if (is_vertical_gap)
 	{
-		if (is_valid_position(cub, x - 1, y) && cub->map[y][x - 1] != '1' && cub->map[y][x - 1] != ' ')
-			ft_error("Door must have a wall or space to its left for vertical opening", cub, NULL);
-		if (is_valid_position(cub, x + 1, y) && cub->map[y][x + 1] != '1' && cub->map[y][x + 1] != ' ')
-			ft_error("Door must have a wall or space to its right for vertical opening", cub, NULL);
+		if (is_valid_position(cub, x - 1, y) && cub->map[y][x - 1] != '1'
+			&& cub->map[y][x - 1] != ' ')
+			ft_error(
+				"Door must have a wall/space to its left for vertical opening",
+				cub, NULL);
+		if (is_valid_position(cub, x + 1, y) && cub->map[y][x + 1] != '1'
+			&& cub->map[y][x + 1] != ' ')
+			ft_error(
+				"Door must have a wall/soace to its right for vertical opening",
+				cub, NULL);
 	}
 }
 
