@@ -154,8 +154,6 @@ int	main(int argc, char *argv[])
 	get_image_data(&cub);
 	load_wall_textures(&cub, cub.mlx);
 	cub.last_mouse_x = WIDTH / 2;
-	if (cub.is_bonus)
-		mlx_mouse_hide(cub.mlx, cub.win);
 	setup_hooks_and_run(&cub);
 	safe_exit(&cub, NULL, 0);
 	return (0);
