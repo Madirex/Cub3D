@@ -341,7 +341,7 @@ static int	*select_texture_buffer(t_cub3d *cub, t_tex_query *q)
 		&& cub->door_textures && cub->door_textures[1] != NULL)
 		is_door_adjacent = 1;
 	if (is_door_adjacent)
-		return (cub->door_textures[1]);
+		return (cub->door_textures[3]);
 	return (cub->wall_textures[get_wall_texture(q->side, 0, 0)]);
 }
 
