@@ -100,7 +100,6 @@ typedef struct s_render_ctx
 */
 static int	get_wall_texture(int side, double rayDirX, double rayDirY)
 {
-	(void)rayDirY;
 	if (side == 0)
 	{
 		if (rayDirX > 0)
@@ -317,17 +316,28 @@ void	draw_minimap(t_cub3d *cub, t_img *img)
 */
 static int	*select_texture_buffer(t_cub3d *cub, t_tex_query *q)
 {
-	int	cell_hit;
+	int		cell_hit;
+	int		neighbor_x;
+	int		neighbor_y;
+	int		is_door_adjacent;
 
 	cell_hit = cub->map[q->mapY][q->mapX];
 	if (cub->is_bonus && cell_hit == 'D' && cub->door_textures
 		&& cub->door_textures[0] != NULL)
 		return (cub->door_textures[0]);
-	if (cub->is_bonus && q->mapY >= 0 && q->mapY < cub->map_height
-		&& q->mapX >= 0
-		&& q->mapX < (int)strlen(cub->map[q->mapY])
-		&& cub->map[q->mapY][q->mapX] == 'O' && cub->door_textures
-		&& cub->door_textures[1] != NULL)
+	neighbor_x = q->mapX;
+	neighbor_y = q->mapY;
+	if (q->side == 0)
+		neighbor_x = q->mapX - q->stepX;
+	else
+		neighbor_y = q->mapY - q->stepY;
+	is_door_adjacent = 0;
+	if (cub->is_bonus && neighbor_y >= 0 && neighbor_y < cub->map_height
+		&& neighbor_x >= 0 && neighbor_x < (int)strlen(cub->map[neighbor_y])
+		&& cub->map[neighbor_y][neighbor_x] == 'O'
+		&& cub->door_textures && cub->door_textures[1] != NULL)
+		is_door_adjacent = 1;
+	if (is_door_adjacent)
 		return (cub->door_textures[1]);
 	return (cub->wall_textures[get_wall_texture(q->side, 0, 0)]);
 }
