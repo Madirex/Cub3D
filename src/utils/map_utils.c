@@ -52,7 +52,8 @@ static int	is_valid_map_char(char c, t_cub3d *cub)
  */
 int	is_step_char(char c)
 {
-	return (c == 'N' || c == 'S' || c == 'E' || c == 'W' || c == '0' || c == 'D' || c == 'd');
+	return (c == 'N' || c == 'S' || c == 'E'
+		|| c == 'W' || c == '0' || c == 'D' || c == 'd');
 }
 
 /**

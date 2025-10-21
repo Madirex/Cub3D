@@ -132,8 +132,6 @@ typedef struct s_img
 	int		bytes_per_pixel;
 }				t_img;
 
-
-
 //Raycast
 int		exit_program(t_cub3d *cub);
 void	ft_error(char *message, t_cub3d *cub, char *line);
