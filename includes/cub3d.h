@@ -119,10 +119,34 @@ typedef struct s_readmap_ctx
 	int		stop;	/**< Stop flag */
 }	t_readmap_ctx;
 
-int		exit_program(t_cub3d *cub);
 int		open_and_parse_map(t_cub3d *cub, char *map_path);
 void	init_mlx_and_game(t_cub3d *cub);
 void	setup_hooks_and_run(t_cub3d *cub);
 void	free_game_resources(t_cub3d *cub);
+
+typedef struct s_img
+{
+	char	*data;
+	int		size_line;
+	int		bpp;
+	int		bytes_per_pixel;
+}				t_img;
+
+
+
+//Raycast
+int		exit_program(t_cub3d *cub);
+void	ft_error(char *message, t_cub3d *cub, char *line);
+void	draw_door_prompt(t_cub3d *cub);
+void	draw_minimap(t_cub3d *cub, t_img *img);
+void	raycast_render(t_cub3d *cub, t_img *img);
+int		render_loop(t_cub3d *cub);
+int		handle_key_press(int key, t_cub3d *cub);
+int		handle_key_release(int key, t_cub3d *cub);
+int		handle_mouse_move(int x, int y, t_cub3d *cub);
+void	init_player(t_cub3d *cub);
+void	perform_movements(t_cub3d *cub);
+void	rotate_player(t_cub3d *cub, double angle);
+long	fn_get_time_in_ms(void);
 
 #endif
