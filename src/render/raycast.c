@@ -28,7 +28,6 @@ void	draw_door_prompt(t_cub3d *cub);
 /*
 ** Grouped parameter structs to respect argument limit
 */
-
 typedef struct s_col_geom
 {
 	int		x;
@@ -85,6 +84,17 @@ typedef struct s_tex_query
 	int	stepY;
 }				t_tex_query;
 
+/* Context struct to reduce number of local declarations in render_column */
+typedef struct s_render_ctx
+{
+	t_dda_in		dda_in;
+	t_dda_out		dda_out;
+	t_col_calc_in	calc_in;
+	t_col_geom		g;
+	t_tex_query		q;
+	int				*tex_buf;
+}				t_render_ctx;
+
 /*
 ** Small helpers
 */
@@ -127,7 +137,7 @@ static void	draw_pixel(t_img *img, int x, int y, int color)
 }
 
 /*
-** Minimap helpers
+** Minimap helpers: kept short
 */
 static int	minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
 {
@@ -147,30 +157,82 @@ static int	minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
 	return (COLOR_EMPTY);
 }
 
-static void	minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
+/* fill entire cell area with color (no border handling) */
+static void	minimap_fill_cell(t_img *img, int base_x, int base_y, int color)
 {
 	int	px;
 	int	py;
-	int	border;
 
-	border = 0x000000;
 	py = 0;
 	while (py < MINIMAP_SCALE)
 	{
 		px = 0;
 		while (px < MINIMAP_SCALE)
 		{
-			if (px == 0 || py == 0)
-			{
-				draw_pixel(img, draw_x + px, draw_y + py, border);
-			}
-			else
-			{
-				draw_pixel(img, draw_x + px, draw_y + py, color);
-			}
+			draw_pixel(img, base_x + px, base_y + py, color);
 			px++;
 		}
 		py++;
+	}
+}
+
+/* draw top + left border for a cell */
+static void	minimap_draw_border(t_img *img, int draw_x, int draw_y)
+{
+	int	i;
+
+	i = 0;
+	while (i < MINIMAP_SCALE)
+	{
+		draw_pixel(img, draw_x + i, draw_y, 0x000000);
+		draw_pixel(img, draw_x, draw_y + i, 0x000000);
+		i++;
+	}
+}
+
+static void	minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
+{
+	minimap_fill_cell(img, draw_x, draw_y, color);
+	minimap_draw_border(img, draw_x, draw_y);
+}
+
+/* iterate one row of minimap cells (keeps per-row logic short) */
+static void	minimap_draw_row(t_cub3d *cub, t_img *img, int i, int start_x,
+	int start_y)
+{
+	struct s_minimap_row_ctx
+	{
+		int	j;
+		int	map_cell_x;
+		int	map_cell_y;
+		int	cell_draw_x;
+		int	cell_draw_y;
+		int	color;
+	} ctx;
+
+	ctx.j = -MINIMAP_VIEW_RADIUS;
+	while (ctx.j <= MINIMAP_VIEW_RADIUS)
+	{
+		ctx.map_cell_x = (int)cub->pos_x + ctx.j;
+		ctx.map_cell_y = (int)cub->pos_y + i;
+		ctx.cell_draw_x = start_x + (ctx.j + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
+		ctx.cell_draw_y = start_y + (i + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
+		ctx.color = minimap_cell_color(cub, ctx.map_cell_y, ctx.map_cell_x);
+		minimap_draw_cell(img, ctx.cell_draw_x, ctx.cell_draw_y, ctx.color);
+		ctx.j++;
+	}
+}
+
+static void	minimap_draw_cells(t_cub3d *cub, t_img *img,
+	int minimap_start_x, int minimap_start_y)
+{
+	int	i;
+
+	i = -MINIMAP_VIEW_RADIUS;
+	while (i <= MINIMAP_VIEW_RADIUS)
+	{
+		minimap_draw_row(cub, img, i, minimap_start_x, minimap_start_y);
+		i++;
 	}
 }
 
@@ -212,45 +274,29 @@ static void	minimap_draw_player_dir(t_img *img, int player_pixel_x,
 	draw_pixel(img, dir_end_x, dir_end_y - 1, COLOR_PLAYER);
 }
 
-static void	minimap_draw_cells(t_cub3d *cub, t_img *img,
-	int minimap_start_x, int minimap_start_y)
+/* compute player pixel coords (short helper) */
+static void	minimap_compute_player_coords(t_cub3d *cub, int start_x,
+	int start_y, int *out_x, int *out_y)
 {
-	int	i;
-	int	j;
-	int	map_cell_x;
-	int	map_cell_y;
-	int	cell_draw_x;
-	int	cell_draw_y;
-	int	color;
+	int	player_center_x;
+	int	player_center_y;
+	double	relative_x;
+	double	relative_y;
 
-	i = -MINIMAP_VIEW_RADIUS;
-	while (i <= MINIMAP_VIEW_RADIUS)
-	{
-		j = -MINIMAP_VIEW_RADIUS;
-		while (j <= MINIMAP_VIEW_RADIUS)
-		{
-			map_cell_x = (int)cub->pos_x + j;
-			map_cell_y = (int)cub->pos_y + i;
-			cell_draw_x = minimap_start_x
-				+ (j + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
-			cell_draw_y = minimap_start_y
-				+ (i + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
-			color = minimap_cell_color(cub, map_cell_y, map_cell_x);
-			minimap_draw_cell(img, cell_draw_x, cell_draw_y, color);
-			j++;
-		}
-		i++;
-	}
+	player_center_x = start_x + MINIMAP_VIEW_RADIUS * MINIMAP_SCALE
+		+ MINIMAP_SCALE / 2;
+	player_center_y = start_y + MINIMAP_VIEW_RADIUS * MINIMAP_SCALE
+		+ MINIMAP_SCALE / 2;
+	relative_x = cub->pos_x - (int)cub->pos_x;
+	relative_y = cub->pos_y - (int)cub->pos_y;
+	*out_x = player_center_x + (int)((relative_x - 0.5) * MINIMAP_SCALE);
+	*out_y = player_center_y + (int)((relative_y - 0.5) * MINIMAP_SCALE);
 }
 
 void	draw_minimap(t_cub3d *cub, t_img *img)
 {
 	int			minimap_start_x;
 	int			minimap_start_y;
-	int			player_center_x;
-	int			player_center_y;
-	double		relative_x;
-	double		relative_y;
 	int			player_pixel_x;
 	int			player_pixel_y;
 	t_vec2		dir;
@@ -258,16 +304,8 @@ void	draw_minimap(t_cub3d *cub, t_img *img)
 	minimap_start_x = MINIMAP_MARGIN;
 	minimap_start_y = MINIMAP_MARGIN;
 	minimap_draw_cells(cub, img, minimap_start_x, minimap_start_y);
-	player_center_x = minimap_start_x
-		+ MINIMAP_VIEW_RADIUS * MINIMAP_SCALE + MINIMAP_SCALE / 2;
-	player_center_y = minimap_start_y
-		+ MINIMAP_VIEW_RADIUS * MINIMAP_SCALE + MINIMAP_SCALE / 2;
-	relative_x = cub->pos_x - (int)cub->pos_x;
-	relative_y = cub->pos_y - (int)cub->pos_y;
-	player_pixel_x = player_center_x + (int)((relative_x - 0.5)
-			* MINIMAP_SCALE);
-	player_pixel_y = player_center_y + (int)((relative_y - 0.5)
-			* MINIMAP_SCALE);
+	minimap_compute_player_coords(cub, minimap_start_x, minimap_start_y,
+		&player_pixel_x, &player_pixel_y);
 	minimap_draw_player_square(img, player_pixel_x, player_pixel_y);
 	dir.x = cub->dir_x;
 	dir.y = cub->dir_y;
@@ -294,8 +332,10 @@ static int	*select_texture_buffer(t_cub3d *cub, t_tex_query *q)
 	return (cub->wall_textures[get_wall_texture(q->side, 0, 0)]);
 }
 
-static void	draw_column_floor_ceiling(t_img *img, t_col_geom *g,
-	t_render_colors *cols)
+/*
+** Draw column floor and ceiling (split into two short helpers)
+*/
+static void	draw_column_ceiling(t_img *img, t_col_geom *g, int ceiling)
 {
 	int				y;
 	unsigned int	*pixel;
@@ -308,9 +348,17 @@ static void	draw_column_floor_ceiling(t_img *img, t_col_geom *g,
 		addr += y * img->size_line;
 		addr += g->x * img->bytes_per_pixel;
 		pixel = (unsigned int *)addr;
-		*pixel = (unsigned int)cols->ceiling;
+		*pixel = (unsigned int)ceiling;
 		y++;
 	}
+}
+
+static void	draw_column_floor(t_img *img, t_col_geom *g, int floor)
+{
+	int				y;
+	unsigned int	*pixel;
+	unsigned char	*addr;
+
 	y = g->drawEnd + 1;
 	while (y < HEIGHT)
 	{
@@ -318,11 +366,39 @@ static void	draw_column_floor_ceiling(t_img *img, t_col_geom *g,
 		addr += y * img->size_line;
 		addr += g->x * img->bytes_per_pixel;
 		pixel = (unsigned int *)addr;
-		*pixel = (unsigned int)cols->floor;
+		*pixel = (unsigned int)floor;
 		y++;
 	}
 }
 
+static void	draw_column_floor_ceiling(t_img *img, t_col_geom *g,
+	t_render_colors *cols)
+{
+	draw_column_ceiling(img, g, cols->ceiling);
+	draw_column_floor(img, g, cols->floor);
+}
+
+/*
+** Draw a single textured pixel for a column (short)
+*/
+static void	draw_textured_pixel(t_img *img, t_col_geom *g,
+	int y, int color)
+{
+	unsigned int	*pixel;
+	unsigned char	*addr;
+
+	if (g->side == 1)
+		color = (color >> 1) & 0x7F7F7F;
+	addr = (unsigned char *)img->data;
+	addr += y * img->size_line;
+	addr += g->x * img->bytes_per_pixel;
+	pixel = (unsigned int *)addr;
+	*pixel = (unsigned int)color;
+}
+
+/*
+** Draw textured column using helper per-pixel to keep function short.
+*/
 static void	draw_column_textured(t_cub3d *cub, t_img *img, t_col_geom *g,
 	int *tex_buf)
 {
@@ -330,9 +406,7 @@ static void	draw_column_textured(t_cub3d *cub, t_img *img, t_col_geom *g,
 	double			step;
 	double			texPos;
 	int				texY;
-	unsigned int	*pixel;
 	int				color;
-	unsigned char	*addr;
 
 	if (g->lineHeight <= 0 || tex_buf == NULL)
 		return ;
@@ -344,63 +418,121 @@ static void	draw_column_textured(t_cub3d *cub, t_img *img, t_col_geom *g,
 		texY = (int)texPos & (cub->tex_height - 1);
 		texPos += step;
 		color = tex_buf[cub->tex_width * texY + g->texX];
-		if (g->side == 1)
-			color = (color >> 1) & 0x7F7F7F;
-		addr = (unsigned char *)img->data;
-		addr += y * img->size_line;
-		addr += g->x * img->bytes_per_pixel;
-		pixel = (unsigned int *)addr;
-		*pixel = (unsigned int)color;
+		draw_textured_pixel(img, g, y, color);
 		y++;
 	}
 }
 
 /*
-** DDA: inputs in, outputs out (keeps args small)
+** DDA helpers split to keep perform_dda <= 25 lines and no ternaries.
+*/
+static void	init_delta_dist(t_dda_in *in, double *deltaDistX,
+	double *deltaDistY)
+{
+	if (in->rayDirX == 0)
+		*deltaDistX = 1e30;
+	else
+		*deltaDistX = fabs(1.0 / in->rayDirX);
+	if (in->rayDirY == 0)
+		*deltaDistY = 1e30;
+	else
+		*deltaDistY = fabs(1.0 / in->rayDirY);
+}
+
+static void	init_dda_steps(t_cub3d *cub, t_dda_in *in,
+	t_dda_out *out, double *sideDistX, double *sideDistY)
+{
+	double	deltaDistX;
+	double	deltaDistY;
+
+	init_delta_dist(in, &deltaDistX, &deltaDistY);
+	if (in->rayDirX < 0)
+	{
+		out->stepX = -1;
+		*sideDistX = (cub->pos_x - in->mapX) * deltaDistX;
+	}
+	else
+	{
+		out->stepX = 1;
+		*sideDistX = (in->mapX + 1.0 - cub->pos_x) * deltaDistX;
+	}
+	if (in->rayDirY < 0)
+	{
+		out->stepY = -1;
+		*sideDistY = (cub->pos_y - in->mapY) * deltaDistY;
+	}
+	else
+	{
+		out->stepY = 1;
+		*sideDistY = (in->mapY + 1.0 - cub->pos_y) * deltaDistY;
+	}
+}
+
+/* perform one step of the DDA loop (keeps loop body short) */
+static void	dda_step_update(t_dda_in *in, t_dda_out *out,
+	double *sideDistX, double *sideDistY)
+{
+	double	invRx;
+	double	invRy;
+
+	if (*sideDistX < *sideDistY)
+	{
+		if (in->rayDirX == 0)
+			invRx = 1e30;
+		else
+			invRx = 1.0 / in->rayDirX;
+		*sideDistX += fabs(invRx);
+		in->mapX += out->stepX;
+		out->side = 0;
+	}
+	else
+	{
+		if (in->rayDirY == 0)
+			invRy = 1e30;
+		else
+			invRy = 1.0 / in->rayDirY;
+		*sideDistY += fabs(invRy);
+		in->mapY += out->stepY;
+		out->side = 1;
+	}
+}
+
+/* compute perpWallDist without ternaries (short helper) */
+static void	compute_perp_wall_dist(t_dda_in *in, t_dda_out *out,
+	double sideDistX, double sideDistY)
+{
+	double	inv;
+
+	if (out->side == 0)
+	{
+		if (in->rayDirX == 0)
+			inv = 1e30;
+		else
+			inv = 1.0 / in->rayDirX;
+		out->perpWallDist = sideDistX - fabs(inv);
+	}
+	else
+	{
+		if (in->rayDirY == 0)
+			inv = 1e30;
+		else
+			inv = 1.0 / in->rayDirY;
+		out->perpWallDist = sideDistY - fabs(inv);
+	}
+}
+
+/*
+** perform_dda: <= 25 lines (header .. closing brace) and <= 5 locals
 */
 static int	perform_dda(t_cub3d *cub, t_dda_in *in, t_dda_out *out)
 {
 	double	sideDistX;
 	double	sideDistY;
-	double	deltaDistX;
-	double	deltaDistY;
 
-	deltaDistX = in->rayDirX == 0 ? 1e30 : fabs(1.0 / in->rayDirX);
-	deltaDistY = in->rayDirY == 0 ? 1e30 : fabs(1.0 / in->rayDirY);
-	if (in->rayDirX < 0)
-	{
-		out->stepX = -1;
-		sideDistX = (cub->pos_x - in->mapX) * deltaDistX;
-	}
-	else
-	{
-		out->stepX = 1;
-		sideDistX = (in->mapX + 1.0 - cub->pos_x) * deltaDistX;
-	}
-	if (in->rayDirY < 0)
-	{
-		out->stepY = -1;
-		sideDistY = (cub->pos_y - in->mapY) * deltaDistY;
-	}
-	else
-	{
-		out->stepY = 1;
-		sideDistY = (in->mapY + 1.0 - cub->pos_y) * deltaDistY;
-	}
+	init_dda_steps(cub, in, out, &sideDistX, &sideDistY);
 	while (1)
 	{
-		if (sideDistX < sideDistY)
-		{
-			sideDistX += deltaDistX;
-			in->mapX += out->stepX;
-			out->side = 0;
-		}
-		else
-		{
-			sideDistY += deltaDistY;
-			in->mapY += out->stepY;
-			out->side = 1;
-		}
+		dda_step_update(in, out, &sideDistX, &sideDistY);
 		if (in->mapY < 0 || in->mapY >= cub->map_height
 			|| in->mapX < 0
 			|| in->mapX >= (int)strlen(cub->map[in->mapY]))
@@ -408,10 +540,7 @@ static int	perform_dda(t_cub3d *cub, t_dda_in *in, t_dda_out *out)
 		if (cub->map[in->mapY][in->mapX] == '1'
 			|| (cub->is_bonus && cub->map[in->mapY][in->mapX] == 'D'))
 		{
-			if (out->side == 0)
-				out->perpWallDist = (sideDistX - deltaDistX);
-			else
-				out->perpWallDist = (sideDistY - deltaDistY);
+			compute_perp_wall_dist(in, out, sideDistX, sideDistY);
 			return (1);
 		}
 	}
@@ -440,72 +569,75 @@ static void	compute_column_params(t_cub3d *cub, t_col_calc_in *in,
 }
 
 /*
-** Render a single column with grouped parameters
+** adjust texX for texture flip depending on side and ray direction
+** kept short and explicit
+*/
+static void	render_column_adjust_texx(t_col_geom *g, t_dda_in *dda_in,
+	int tex_width)
+{
+	if (g->side == 0 && dda_in->rayDirX > 0)
+		g->texX = tex_width - g->texX - 1;
+	if (g->side == 1 && dda_in->rayDirY < 0)
+		g->texX = tex_width - g->texX - 1;
+}
+
+/*
+** Render a single column with grouped parameters.
+** Now uses a single local context variable to comply with variable limits.
 */
 static void	render_column(t_cub3d *cub, t_img *img, int x,
 	t_render_colors *cols)
 {
-	t_dda_in	dda_in;
-	t_dda_out	dda_out;
-	t_col_calc_in	calc_in;
-	t_col_geom	g;
-	t_tex_query	q;
-	int			*tex_buf;
+	t_render_ctx	ctx;
 
-	dda_in.mapX = (int)cub->pos_x;
-	dda_in.mapY = (int)cub->pos_y;
-	dda_in.rayDirX = cub->dir_x + cub->plane_x
+	ctx.dda_in.mapX = (int)cub->pos_x;
+	ctx.dda_in.mapY = (int)cub->pos_y;
+	ctx.dda_in.rayDirX = cub->dir_x + cub->plane_x
 		* (2 * x / (double)WIDTH - 1);
-	dda_in.rayDirY = cub->dir_y + cub->plane_y
+	ctx.dda_in.rayDirY = cub->dir_y + cub->plane_y
 		* (2 * x / (double)WIDTH - 1);
-	if (!perform_dda(cub, &dda_in, &dda_out))
+	if (!perform_dda(cub, &ctx.dda_in, &ctx.dda_out))
 		return ;
-	calc_in.perpWallDist = dda_out.perpWallDist;
-	calc_in.side = dda_out.side;
-	calc_in.rayDirX = dda_in.rayDirX;
-	calc_in.rayDirY = dda_in.rayDirY;
-	g.x = x;
-	compute_column_params(cub, &calc_in, &g);
-	if (g.side == 0 && dda_in.rayDirX > 0)
-		g.texX = cub->tex_width - g.texX - 1;
-	if (g.side == 1 && dda_in.rayDirY < 0)
-		g.texX = cub->tex_width - g.texX - 1;
-	q.side = g.side;
-	q.mapX = dda_in.mapX;
-	q.mapY = dda_in.mapY;
-	q.stepX = dda_out.stepX;
-	q.stepY = dda_out.stepY;
-	tex_buf = select_texture_buffer(cub, &q);
-	draw_column_floor_ceiling(img, &g, cols);
-	draw_column_textured(cub, img, &g, tex_buf);
+	ctx.calc_in.perpWallDist = ctx.dda_out.perpWallDist;
+	ctx.calc_in.side = ctx.dda_out.side;
+	ctx.calc_in.rayDirX = ctx.dda_in.rayDirX;
+	ctx.calc_in.rayDirY = ctx.dda_in.rayDirY;
+	ctx.g.x = x;
+	compute_column_params(cub, &ctx.calc_in, &ctx.g);
+	render_column_adjust_texx(&ctx.g, &ctx.dda_in, cub->tex_width);
+	ctx.q.side = ctx.g.side;
+	ctx.q.mapX = ctx.dda_in.mapX;
+	ctx.q.mapY = ctx.dda_in.mapY;
+	ctx.q.stepX = ctx.dda_out.stepX;
+	ctx.q.stepY = ctx.dda_out.stepY;
+	ctx.tex_buf = select_texture_buffer(cub, &ctx.q);
+	draw_column_floor_ceiling(img, &ctx.g, cols);
+	draw_column_textured(cub, img, &ctx.g, ctx.tex_buf);
 }
 
+/*
+** raycast_render: kept short
+*/
 void	raycast_render(t_cub3d *cub, t_img *img)
 {
 	int				x;
 	t_render_colors	cols;
 
 	img->bytes_per_pixel = img->bpp / 8;
+	/* ceiling */
 	if (cub->textures.ceiling.r != -1)
-	{
 		cols.ceiling = rgb_to_int(cub->textures.ceiling.r,
 				cub->textures.ceiling.g,
 				cub->textures.ceiling.b);
-	}
 	else
-	{
 		cols.ceiling = 0x202020;
-	}
+	/* floor */
 	if (cub->textures.floor.r != -1)
-	{
 		cols.floor = rgb_to_int(cub->textures.floor.r,
 				cub->textures.floor.g,
 				cub->textures.floor.b);
-	}
 	else
-	{
 		cols.floor = 0x707070;
-	}
 	x = 0;
 	while (x < WIDTH)
 	{
@@ -529,32 +661,43 @@ static int	get_target_cell_coords(t_cub3d *cub, double dist,
 	return (1);
 }
 
+/* toggle door state at coordinates (short) */
+static void	toggle_door_at(t_cub3d *cub, int mx, int my)
+{
+	char	*cell;
+
+	cell = &cub->map[my][mx];
+	if (*cell == 'D')
+		*cell = 'O';
+	else if (*cell == 'O')
+		*cell = 'D';
+}
+
+/* check if target is same as player (short) */
+static int	is_same_as_player(t_cub3d *cub, int mx, int my)
+{
+	return ((int)cub->pos_x == mx && (int)cub->pos_y == my);
+}
+
 void	handle_door_action(t_cub3d *cub)
 {
-	int		target_mapX;
-	int		target_mapY;
-	int		player_mapX;
-	int		player_mapY;
-	char	*target_cell;
+	int	target_mapX;
+	int	target_mapY;
 
 	if (!cub->is_bonus)
 		return ;
 	if (!get_target_cell_coords(cub, 1.0, &target_mapX, &target_mapY))
 		return ;
-	target_cell = &cub->map[target_mapY][target_mapX];
-	if (*target_cell == 'D')
+	if (cub->map[target_mapY][target_mapX] == 'D')
 	{
-		*target_cell = 'O';
+		toggle_door_at(cub, target_mapX, target_mapY);
 		return ;
 	}
-	if (*target_cell == 'O')
+	if (cub->map[target_mapY][target_mapX] == 'O')
 	{
-		player_mapX = (int)cub->pos_x;
-		player_mapY = (int)cub->pos_y;
-		if (target_mapX == player_mapX
-			&& target_mapY == player_mapY)
+		if (is_same_as_player(cub, target_mapX, target_mapY))
 			return ;
-		*target_cell = 'D';
+		toggle_door_at(cub, target_mapX, target_mapY);
 	}
 }
 
@@ -693,34 +836,41 @@ int	render_loop(t_cub3d *cub)
 }
 
 /*
-** Door prompt
+** Door prompt helpers
 */
+static int	check_near_far_target(t_cub3d *cub, double near_d,
+	double far_d, int *out_x, int *out_y)
+{
+	if (!get_target_cell_coords(cub, near_d, out_x, out_y))
+		return (0);
+	if ((int)cub->pos_x == *out_x && (int)cub->pos_y == *out_y)
+	{
+		if (!get_target_cell_coords(cub, far_d, out_x, out_y))
+			return (0);
+	}
+	return (1);
+}
+
+static const char	*select_door_message(char cell)
+{
+	if (cell == 'D')
+		return ("Press SPACE to open");
+	return ("Press SPACE to close");
+}
+
 void	draw_door_prompt(t_cub3d *cub)
 {
 	int			target_mapX;
 	int			target_mapY;
 	const char	*message;
 	char		target_cell;
-	const double	check_dist_near = 0.75;
-	const double	check_dist_far = 1.5;
 
-	if (!get_target_cell_coords(cub, check_dist_near,
-			&target_mapX, &target_mapY))
+	if (!check_near_far_target(cub, 0.75, 1.5, &target_mapX, &target_mapY))
 		return ;
-	if ((int)cub->pos_x == target_mapX
-		&& (int)cub->pos_y == target_mapY)
-	{
-		if (!get_target_cell_coords(cub, check_dist_far,
-				&target_mapX, &target_mapY))
-			return ;
-	}
 	target_cell = cub->map[target_mapY][target_mapX];
 	if (cub->is_bonus && (target_cell == 'D' || target_cell == 'O'))
 	{
-		if (target_cell == 'D')
-			message = "Press SPACE to open";
-		else
-			message = "Press SPACE to close";
+		message = select_door_message(target_cell);
 		mlx_string_put(cub->mlx, cub->win,
 			(WIDTH / 2) - 100, HEIGHT - 50,
 			0xFFFFFF, (char *)message);
@@ -728,38 +878,50 @@ void	draw_door_prompt(t_cub3d *cub)
 }
 
 /*
-** Player init helpers
+** Player init helpers (split small setters)
 */
+static void	set_dir_n(t_cub3d *cub)
+{
+	cub->dir_x = 0;
+	cub->dir_y = -1;
+	cub->plane_x = 0.66;
+	cub->plane_y = 0;
+}
+
+static void	set_dir_s(t_cub3d *cub)
+{
+	cub->dir_x = 0;
+	cub->dir_y = 1;
+	cub->plane_x = -0.66;
+	cub->plane_y = 0;
+}
+
+static void	set_dir_e(t_cub3d *cub)
+{
+	cub->dir_x = 1;
+	cub->dir_y = 0;
+	cub->plane_x = 0;
+	cub->plane_y = 0.66;
+}
+
+static void	set_dir_w(t_cub3d *cub)
+{
+	cub->dir_x = -1;
+	cub->dir_y = 0;
+	cub->plane_x = 0;
+	cub->plane_y = -0.66;
+}
+
 static void	set_player_dir(t_cub3d *cub, char dir)
 {
 	if (dir == 'N')
-	{
-		cub->dir_x = 0;
-		cub->dir_y = -1;
-		cub->plane_x = 0.66;
-		cub->plane_y = 0;
-	}
+		set_dir_n(cub);
 	else if (dir == 'S')
-	{
-		cub->dir_x = 0;
-		cub->dir_y = 1;
-		cub->plane_x = -0.66;
-		cub->plane_y = 0;
-	}
+		set_dir_s(cub);
 	else if (dir == 'E')
-	{
-		cub->dir_x = 1;
-		cub->dir_y = 0;
-		cub->plane_x = 0;
-		cub->plane_y = 0.66;
-	}
+		set_dir_e(cub);
 	else if (dir == 'W')
-	{
-		cub->dir_x = -1;
-		cub->dir_y = 0;
-		cub->plane_x = 0;
-		cub->plane_y = -0.66;
-	}
+		set_dir_w(cub);
 }
 
 static int	find_player_position(t_cub3d *cub)
