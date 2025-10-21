@@ -143,8 +143,6 @@ int	main(int argc, char *argv[])
 	t_cub3d		cub;
 	void		*mlx;
 
-	if (argc != 2)
-		return (1);
 	(void) argc;
 	init_cub3d(&cub, IS_BONUS);
 	fd = open_and_parse_map(&cub, argv[1]);
