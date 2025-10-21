@@ -323,8 +323,8 @@ static int	*select_texture_buffer(t_cub3d *cub, t_tex_query *q)
 
 	cell_hit = cub->map[q->mapY][q->mapX];
 	if (cub->is_bonus && cell_hit == 'D' && cub->door_textures
-		&& cub->door_textures[0] != NULL)
-		return (cub->door_textures[0]);
+		&& cub->door_textures[cub->door_anim_frame] != NULL)
+		return (cub->door_textures[cub->door_anim_frame]);
 	neighbor_x = q->mapX;
 	neighbor_y = q->mapY;
 	if (q->side == 0)
@@ -824,6 +824,18 @@ long	fn_get_time_in_ms(void)
 	return ((long)(tv.tv_sec * 1000 + tv.tv_usec / 1000));
 }
 
+static void	update_door_animation(t_cub3d *cub)
+{
+	if (!cub->is_bonus || !cub->door_textures)
+		return ;
+	cub->door_anim_timer += cub->time_frame;
+	if (cub->door_anim_timer >= cub->door_anim_speed)
+	{
+		cub->door_anim_frame = (cub->door_anim_frame + 1) % 3;
+		cub->door_anim_timer = 0.0;
+	}
+}
+
 int	render_loop(t_cub3d *cub)
 {
 	long	current_time;
@@ -833,6 +845,7 @@ int	render_loop(t_cub3d *cub)
 	cub->time_frame = (current_time - cub->time_prev) / 1000.0;
 	cub->time_prev = current_time;
 	perform_movements(cub);
+	update_door_animation(cub);
 	img.data = cub->img_data;
 	img.size_line = cub->size_line;
 	img.bpp = cub->bpp;

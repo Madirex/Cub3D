@@ -45,7 +45,9 @@ static void	process_texture_or_color_line(t_cub3d *cub, char *line)
 		|| is_texture_line(line, "WE ")
 		|| is_texture_line(line, "EA ")
 		|| (cub->is_bonus && is_texture_line(line, "DC "))
-		|| (cub->is_bonus && is_texture_line(line, "DO ")))
+		|| (cub->is_bonus && is_texture_line(line, "DO "))
+		|| (cub->is_bonus && is_texture_line(line, "D2 "))
+		|| (cub->is_bonus && is_texture_line(line, "D3 ")))
 		assign_texture(cub, line);
 	else if (is_color_line(line, 'F'))
 		assign_color(&cub->textures.floor, line);

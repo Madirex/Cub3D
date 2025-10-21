@@ -46,14 +46,16 @@ typedef struct s_rgb
  */
 typedef struct s_textures
 {
-	char	*no;		/**< North wall texture path */
-	char	*so;		/**< South wall texture path */
-	char	*we;		/**< West wall texture path */
-	char	*ea;		/**< East wall texture path */
-	char	*door_closed;
-	char	*door_open;
-	t_rgb	floor;		/**< Floor color in RGB */
-	t_rgb	ceiling;	/**< Ceiling color in RGB */
+	char	*no;			/**< North wall texture path */
+	char	*so;			/**< South wall texture path */
+	char	*we;			/**< West wall texture path */
+	char	*ea;			/**< East wall texture path */
+	char	*door_closed;	/**< D1: First door frame */
+	char	*door_closed_2;	/**< D2: Second door frame */
+	char	*door_closed_3;	/**< D3: Third door frame */
+	char	*door_open;		/**< DO: Open door texture */
+	t_rgb	floor;			/**< Floor color in RGB */
+	t_rgb	ceiling;		/**< Ceiling color in RGB */
 }	t_textures;
 
 /**
@@ -72,8 +74,11 @@ typedef struct s_cub3d
 	int			player_x;	/**< Player X position on map */
 	int			player_y;	/**< Player Y position on map */
 	char		player_dir;	/**< Player initial direction (N/S/E/W) */
-	int			**wall_textures; // [4][tex_width*tex_height]
-	int			**door_textures; // [1][tex_width*tex_height]
+	int			**wall_textures;
+	int			**door_textures;
+	int			door_anim_frame;	/**< Current animation frame (0, 1, 2) */
+	double		door_anim_timer;	/**< Animation timer */
+	double		door_anim_speed;	/**< Animation speed (seconds per frame) */
 	int			tex_width;
 	int			tex_height;
 	int			is_bonus;

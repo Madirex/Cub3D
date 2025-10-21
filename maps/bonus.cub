@@ -4,6 +4,8 @@ WE ./textures/brown_brick_wall.xpm
 EA ./textures/rough_red_brick_wall.xpm
 DC ./textures/door.xpm
 DO ./textures/door_open.xpm
+D2 ./textures/door_open.xpm
+D3 ./textures/brown_brick_wall.xpm
 
 F 220,100,0
 C 225,30,0

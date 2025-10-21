@@ -80,7 +80,7 @@ static int	*load_xpm_buffer(void *mlx, char *path, int *width, int *height)
 */
 static void	init_door_textures_array(t_cub3d *cub)
 {
-	cub->door_textures = malloc(sizeof(*cub->door_textures) * 2);
+	cub->door_textures = malloc(sizeof(*cub->door_textures) * 4);
 	if (!cub->door_textures)
 	{
 		fprintf(stderr, "Error: malloc falló door_textures\n");
@@ -98,11 +98,35 @@ static void	set_door_open_texture(t_cub3d *cub, void *mlx, int *tmp_w, int *tmp_
 
 	if (cub->textures.door_open == NULL)
 	{
-		cub->door_textures[1] = NULL;
+		cub->door_textures[3] = NULL;
 		return ;
 	}
 	buf_open = load_xpm_buffer(mlx, cub->textures.door_open, tmp_w, tmp_h);
-	cub->door_textures[1] = buf_open;
+	cub->door_textures[3] = buf_open;
+}
+
+/*
+** Carga los frames de la animación de la puerta cerrada.
+*/
+static void	load_door_frames(t_cub3d *cub, void *mlx, int *w, int *h)
+{
+	int	tmp_w;
+	int	tmp_h;
+
+	tmp_w = *w;
+	tmp_h = *h;
+	cub->door_textures[0] = load_xpm_buffer(mlx,
+		cub->textures.door_closed, &tmp_w, &tmp_h);
+	if (cub->textures.door_closed_2)
+		cub->door_textures[1] = load_xpm_buffer(mlx,
+			cub->textures.door_closed_2, &tmp_w, &tmp_h);
+	else
+		cub->door_textures[1] = cub->door_textures[0];
+	if (cub->textures.door_closed_3)
+		cub->door_textures[2] = load_xpm_buffer(mlx,
+			cub->textures.door_closed_3, &tmp_w, &tmp_h);
+	else
+		cub->door_textures[2] = cub->door_textures[0];
 }
 
 /*
@@ -122,9 +146,11 @@ static void	load_doors(t_cub3d *cub, void *mlx, int *w, int *h)
 	init_door_textures_array(cub);
 	tmp_w = *w;
 	tmp_h = *h;
-	cub->door_textures[0] = load_xpm_buffer(mlx,
-			cub->textures.door_closed, &tmp_w, &tmp_h);
+	load_door_frames(cub, mlx, &tmp_w, &tmp_h);
 	set_door_open_texture(cub, mlx, &tmp_w, &tmp_h);
+	cub->door_anim_frame = 0;
+	cub->door_anim_timer = 0.0;
+	cub->door_anim_speed = 0.15;
 	if (!cub->door_textures[0])
 	{
 		fprintf(stderr, "Error: door texture definida pero fallo al cargar\n");
