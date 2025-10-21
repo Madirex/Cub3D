@@ -196,6 +196,8 @@ void	validate_map(t_cub3d *cub)
 {
 	int	**visited;
 	int	i;
+	int	y;
+	int	x;
 
 	if (!cub->map || cub->map_height == 0)
 		ft_error("No map found", cub, NULL);
@@ -212,7 +214,18 @@ void	validate_map(t_cub3d *cub)
 			handle_visited_allocation_failure(visited, i, cub);
 		i++;
 	}
-	flood_fill(cub, visited, cub->player_x, cub->player_y);
+	y = 0;
+	while (y < cub->map_height)
+	{
+		x = 0;
+		while (x < (int)ft_strlen(cub->map[y]))
+		{
+			if (is_step_char(cub->map[y][x]) && !visited[y][x])
+				flood_fill(cub, visited, x, y);
+			x++;
+		}
+		y++;
+	}
 	i = 0;
 	while (i < cub->map_height)
 	{

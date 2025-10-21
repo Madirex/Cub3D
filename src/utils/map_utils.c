@@ -42,6 +42,20 @@ static int	is_valid_map_char(char c, t_cub3d *cub)
 }
 
 /**
+ * @brief Checks if a character represents a step in the map
+ * 
+ * Valid step characters include player start positions,
+ * empty spaces, and doors.
+ * 
+ * @param c Character to check
+ * @return 1 if character is a step character, 0 otherwise
+ */
+int	is_step_char(char c)
+{
+	return (c == 'N' || c == 'S' || c == 'E' || c == 'W' || c == '0' || c == 'D' || c == 'd');
+}
+
+/**
  * @brief Frees all allocated texture memory
  * 
  * Safely frees all texture path strings in the textures structure.
