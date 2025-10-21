@@ -84,6 +84,17 @@ typedef struct s_tex_query
 	int	stepY;
 }				t_tex_query;
 
+/* moved minimap row context struct up with the other typedefs */
+typedef struct s_minimap_row_ctx
+{
+	int	j;
+	int	map_cell_x;
+	int	map_cell_y;
+	int	cell_draw_x;
+	int	cell_draw_y;
+	int	color;
+}				t_minimap_row_ctx;
+
 /* Context struct to reduce number of local declarations in render_column */
 typedef struct s_render_ctx
 {
@@ -199,15 +210,7 @@ static void	minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
 static void	minimap_draw_row(t_cub3d *cub, t_img *img, int i, int start_x,
 	int start_y)
 {
-	struct s_minimap_row_ctx
-	{
-		int	j;
-		int	map_cell_x;
-		int	map_cell_y;
-		int	cell_draw_x;
-		int	cell_draw_y;
-		int	color;
-	} ctx;
+	t_minimap_row_ctx ctx;
 
 	ctx.j = -MINIMAP_VIEW_RADIUS;
 	while (ctx.j <= MINIMAP_VIEW_RADIUS)
