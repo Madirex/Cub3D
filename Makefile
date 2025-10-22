@@ -76,44 +76,44 @@ re: fclean all
 test: $(NAME)
 	@echo "🧪 Starting comprehensive test suite..."
 	@echo ""
-	@if [ ! -d "temp" ]; then \
-		echo "❌ Error: Directory 'temp' does not exist"; \
+	@if [ ! -d "tests" ]; then \
+		echo "❌ Error: Directory 'tests' does not exist"; \
 		exit 1; \
 	fi
-	@if [ ! -d "temp/maps" ]; then \
-		echo "❌ Error: Directory 'temp/maps' does not exist"; \
+	@if [ ! -d "tests/maps" ]; then \
+		echo "❌ Error: Directory 'tests/maps' does not exist"; \
 		exit 1; \
 	fi
-	@if [ ! -d "temp/maps/good" ]; then \
-		echo "❌ Error: Directory 'temp/maps/good' does not exist"; \
+	@if [ ! -d "tests/maps/good" ]; then \
+		echo "❌ Error: Directory 'tests/maps/good' does not exist"; \
 		exit 1; \
 	fi
-	@if [ ! -d "temp/maps/bad" ]; then \
-		echo "❌ Error: Directory 'temp/maps/bad' does not exist"; \
+	@if [ ! -d "tests/maps/bad" ]; then \
+		echo "❌ Error: Directory 'tests/maps/bad' does not exist"; \
 		exit 1; \
 	fi
 	@echo "🟢 Correct cases"
 	@echo "=================="
-	@for map in temp/maps/good/*.cub; do \
+	@for map in tests/maps/good/*.cub; do \
 		if [ -f "$$map" ]; then \
 			echo "Testing: $$map"; \
 			./$(NAME) "$$map" || echo "❌ Failed: $$map"; \
 		fi; \
 	done
-	@if [ -z "$$(ls temp/maps/good/*.cub 2>/dev/null)" ]; then \
-		echo "⚠️  No .cub files found in temp/maps/good/"; \
+	@if [ -z "$$(ls tests/maps/good/*.cub 2>/dev/null)" ]; then \
+		echo "⚠️  No .cub files found in tests/maps/good/"; \
 	fi
 	@echo ""
 	@echo "🔴 Incorrect cases"
 	@echo "=================="
-	@for map in temp/maps/bad/*.cub; do \
+	@for map in tests/maps/bad/*.cub; do \
 		if [ -f "$$map" ]; then \
 			echo "Testing: $$map"; \
 			./$(NAME) "$$map" && echo "⚠️  Expected failure but passed: $$map" || echo "✅ Correctly failed: $$map"; \
 		fi; \
 	done
-	@if [ -z "$$(ls temp/maps/bad/*.cub 2>/dev/null)" ]; then \
-		echo "⚠️  No .cub files found in temp/maps/bad/"; \
+	@if [ -z "$$(ls tests/maps/bad/*.cub 2>/dev/null)" ]; then \
+		echo "⚠️  No .cub files found in tests/maps/bad/"; \
 	fi
 	@echo ""
 	@echo "🏁 Test suite completed!"
