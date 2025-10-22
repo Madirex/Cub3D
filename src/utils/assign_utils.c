@@ -57,6 +57,30 @@ static void	set_texture(char **texture, char *line, int k)
 }
 
 /**
+ * @brief Helper function to find the starting position of texture path in a line
+ * 
+ * Skips whitespace and the texture identifier to find where the
+ * actual texture path starts.
+ * 
+ * @param line The line containing the texture configuration
+ * @return Index of the first character of the texture path
+ */
+static int	find_texture_path_start(const char *line)
+{
+	int	i;
+
+	if (!line)
+		return (0);
+	i = 0;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	i += 2;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	return (i);
+}
+
+/**
  * @brief Assigns a texture based on the line identifier
  * 
  * Parses the line to identify which texture (NO, SO, WE, EA)
@@ -71,12 +95,7 @@ void	assign_texture(t_cub3d *cub, char *line)
 
 	if (!line)
 		return ;
-	i = 0;
-	while (line[i] == ' ' || line[i] == '\t')
-		i++;
-	i += 2;
-	while (line[i] == ' ' || line[i] == '\t')
-		i++;
+	i = find_texture_path_start(line);
 	if (is_texture_line(line, "NO "))
 		set_texture(&cub->textures.no, line, i);
 	else if (is_texture_line(line, "SO "))
@@ -85,4 +104,14 @@ void	assign_texture(t_cub3d *cub, char *line)
 		set_texture(&cub->textures.we, line, i);
 	else if (is_texture_line(line, "EA "))
 		set_texture(&cub->textures.ea, line, i);
+	else if (cub->is_bonus && is_texture_line(line, "DC "))
+		set_texture(&cub->textures.door_closed, line, i);
+	else if (cub->is_bonus && is_texture_line(line, "DO "))
+		set_texture(&cub->textures.door_open, line, i);
+	else if (cub->is_bonus && is_texture_line(line, "D2 "))
+		set_texture(&cub->textures.door_closed_2, line, i);
+	else if (cub->is_bonus && is_texture_line(line, "D3 "))
+		set_texture(&cub->textures.door_closed_3, line, i);
+	else
+		ft_error("Invalid texture identifier", cub, line);
 }

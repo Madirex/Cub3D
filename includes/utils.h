@@ -25,5 +25,6 @@
 
 void	ft_error(char *message, t_cub3d *cub, char *line);
 int		is_whitespace_only(const char *line);
+int		is_step_char(char c);
 
 #endif

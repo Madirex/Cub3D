@@ -26,5 +26,7 @@
 int		is_texture_line(const char *line, const char *id);
 int		is_color_line(const char *line, char id);
 void	assign_color(t_rgb *color, char *line);
+int		*load_xpm_buffer(void *mlx, char *path, int *width, int *height);
+void	load_wall_textures(t_cub3d *cub, void *mlx);
 
 #endif

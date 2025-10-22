@@ -40,6 +40,13 @@ void	print_textures_debug(t_cub3d *cub)
 		printf("WE: %s\n", cub->textures.we);
 	if (cub->textures.ea)
 		printf("EA: %s\n", cub->textures.ea);
+	if (cub->is_bonus)
+	{
+		if (cub->textures.door_closed)
+			printf("Door Closed: %s\n", cub->textures.door_closed);
+		if (cub->textures.door_open)
+			printf("Door Open: %s\n", cub->textures.door_open);
+	}
 	if (cub->textures.floor.r != -1)
 		printf("Floor: %d,%d,%d\n", cub->textures.floor.r,
 			cub->textures.floor.g, cub->textures.floor.b);

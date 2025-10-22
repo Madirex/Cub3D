@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_loader.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:58:49 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/07/09 19:58:51 by anmateo-         ###   ########.fr       */
+/*   Updated: 2025/10/22 14:43:34 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,11 @@ static void	process_texture_or_color_line(t_cub3d *cub, char *line)
 	if (is_texture_line(line, "NO ")
 		|| is_texture_line(line, "SO ")
 		|| is_texture_line(line, "WE ")
-		|| is_texture_line(line, "EA "))
+		|| is_texture_line(line, "EA ")
+		|| (cub->is_bonus && is_texture_line(line, "DC "))
+		|| (cub->is_bonus && is_texture_line(line, "DO "))
+		|| (cub->is_bonus && is_texture_line(line, "D2 "))
+		|| (cub->is_bonus && is_texture_line(line, "D3 ")))
 		assign_texture(cub, line);
 	else if (is_color_line(line, 'F'))
 		assign_color(&cub->textures.floor, line);
@@ -65,7 +69,7 @@ static void	process_texture_or_color_line(t_cub3d *cub, char *line)
  */
 static int	check_map_start(t_cub3d *cub, char *line)
 {
-	if (is_map_line(line))
+	if (is_map_line(line, cub))
 	{
 		if (!cub->textures.no || !cub->textures.so
 			|| !cub->textures.we || !cub->textures.ea

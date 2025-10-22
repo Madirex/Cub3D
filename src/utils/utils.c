@@ -22,14 +22,16 @@
 #include <stdio.h>
 #include "../../includes/cub3d.h"
 #include "../../includes/map_utils.h"
+#include <mlx.h>
 
 /**
  * @brief Safely exits the program after cleaning up resources
  * 
  * @param cub Pointer to the main Cub3D structure (for cleanup)
  * @param line Line to free if not NULL
+ * @param exit_code Exit code
  */
-static void	safe_exit(t_cub3d *cub, char *line)
+void	safe_exit(t_cub3d *cub, char *line, int exit_code)
 {
 	if (cub)
 	{
@@ -39,7 +41,7 @@ static void	safe_exit(t_cub3d *cub, char *line)
 	}
 	if (line)
 		free(line);
-	exit(1);
+	exit(exit_code);
 }
 
 /**
@@ -57,7 +59,7 @@ void	ft_error(char *message, t_cub3d *cub, char *line)
 	printf("Error\n");
 	if (message)
 		printf("%s\n", message);
-	safe_exit(cub, line);
+	safe_exit(cub, line, 1);
 }
 
 /**
@@ -90,8 +92,9 @@ int	is_whitespace_only(const char *line)
  * to indicate they haven't been set yet.
  * 
  * @param cub Pointer to the main Cub3D structure to initialize
+ * @param is_bonus Flag indicating if bonus features are enabled
  */
-void	init_cub3d(t_cub3d *cub)
+void	init_cub3d(t_cub3d *cub, int is_bonus)
 {
 	ft_memset(cub, 0, sizeof(t_cub3d));
 	cub->textures.floor.r = -1;
@@ -100,4 +103,25 @@ void	init_cub3d(t_cub3d *cub)
 	cub->textures.ceiling.r = -1;
 	cub->textures.ceiling.g = -1;
 	cub->textures.ceiling.b = -1;
+	cub->is_bonus = is_bonus;
+}
+
+/**
+ * @brief Cleans up resources and exits the program
+ * * @param cub Pointer to the main Cub3D structure
+ * @return 0 (never returns, exits the program)
+ */
+int	exit_program(t_cub3d *cub)
+{
+	if (!cub)
+		exit(0);
+	if (cub->img && cub->mlx)
+		mlx_destroy_image(cub->mlx, cub->img);
+	if (cub->win && cub->mlx)
+		mlx_destroy_window(cub->mlx, cub->win);
+	free_textures(&cub->textures);
+	if (cub->map)
+		free_map(cub->map, cub->map_height);
+	exit(0);
+	return (0);
 }

@@ -16,10 +16,31 @@ SRC_FILES   = main \
 			  debug/debug_print \
 			  validations/validate_map \
 			  validations/validation_utils \
+			  validations/validation_map_utils \
 			  loader/map_loader \
+			  loader/doors_loader \
+			  loader/wall_loader \
+			  loader/xpm_util \
+			  loader/texture_loader \
 			  utils/utils \
 			  utils/assign_utils \
-			  utils/map_utils
+			  utils/map_utils \
+			  render/column_render \
+			  render/dda_init \
+			  render/dda_loop \
+			  render/doors_logic \
+			  render/doors_prompt \
+			  render/keyboard_mouse \
+			  render/minimap_cells \
+			  render/minimap_player \
+			  render/movement \
+			  render/player_dirs \
+			  render/player_init \
+			  render/textures_and_columns \
+			  render/timing_loop \
+			  render/raycast_utils \
+
+
 
 
 OBJS        = $(addprefix $(OBJS_DIR), $(addsuffix .o, $(SRC_FILES)))
@@ -73,46 +94,74 @@ re: fclean all
 test: $(NAME)
 	@echo "🧪 Starting comprehensive test suite..."
 	@echo ""
-	@if [ ! -d "temp" ]; then \
-		echo "❌ Error: Directory 'temp' does not exist"; \
+	@if [ ! -d "tests" ]; then \
+		echo "❌ Error: Directory 'tests' does not exist"; \
 		exit 1; \
 	fi
-	@if [ ! -d "temp/maps" ]; then \
-		echo "❌ Error: Directory 'temp/maps' does not exist"; \
+	@if [ ! -d "tests/maps" ]; then \
+		echo "❌ Error: Directory 'tests/maps' does not exist"; \
 		exit 1; \
 	fi
-	@if [ ! -d "temp/maps/good" ]; then \
-		echo "❌ Error: Directory 'temp/maps/good' does not exist"; \
+	@if [ ! -d "tests/maps/good" ]; then \
+		echo "❌ Error: Directory 'tests/maps/good' does not exist"; \
 		exit 1; \
 	fi
-	@if [ ! -d "temp/maps/bad" ]; then \
-		echo "❌ Error: Directory 'temp/maps/bad' does not exist"; \
+	@if [ ! -d "tests/maps/bad" ]; then \
+		echo "❌ Error: Directory 'tests/maps/bad' does not exist"; \
 		exit 1; \
 	fi
 	@echo "🟢 Correct cases"
 	@echo "=================="
-	@for map in temp/maps/good/*.cub; do \
+	@for map in tests/maps/good/*.cub; do \
 		if [ -f "$$map" ]; then \
 			echo "Testing: $$map"; \
 			./$(NAME) "$$map" || echo "❌ Failed: $$map"; \
 		fi; \
 	done
-	@if [ -z "$$(ls temp/maps/good/*.cub 2>/dev/null)" ]; then \
-		echo "⚠️  No .cub files found in temp/maps/good/"; \
+	@if [ -z "$$(ls tests/maps/good/*.cub 2>/dev/null)" ]; then \
+		echo "⚠️  No .cub files found in tests/maps/good/"; \
 	fi
 	@echo ""
 	@echo "🔴 Incorrect cases"
 	@echo "=================="
-	@for map in temp/maps/bad/*.cub; do \
+	@for map in tests/maps/bad/*.cub; do \
 		if [ -f "$$map" ]; then \
 			echo "Testing: $$map"; \
 			./$(NAME) "$$map" && echo "⚠️  Expected failure but passed: $$map" || echo "✅ Correctly failed: $$map"; \
 		fi; \
 	done
-	@if [ -z "$$(ls temp/maps/bad/*.cub 2>/dev/null)" ]; then \
-		echo "⚠️  No .cub files found in temp/maps/bad/"; \
+	@if [ -z "$$(ls tests/maps/bad/*.cub 2>/dev/null)" ]; then \
+		echo "⚠️  No .cub files found in tests/maps/bad/"; \
 	fi
 	@echo ""
 	@echo "🏁 Test suite completed!"
+
+test-bonus: $(NAME)
+	@echo "🟡 Bonus tests - Good maps"
+	@echo "========================="
+	@for map in tests/maps/bonus/good/*.cub; do \
+		if [ -f "$$map" ]; then \
+			echo "Testing bonus: $$map"; \
+			./$(NAME) "$$map" || echo "❌ Failed bonus: $$map"; \
+		fi; \
+	done
+	@if [ -z "$$(ls tests/maps/bonus/good/*.cub 2>/dev/null)" ]; then \
+		echo "⚠️  No bonus .cub files found in tests/maps/bonus/good/"; \
+	fi
+	@echo ""
+	@echo "🔶 Bonus tests - Bad maps"
+	@echo "========================="
+	@for map in tests/maps/bonus/bad/*.cub; do \
+		if [ -f "$$map" ]; then \
+			echo "Testing bonus: $$map"; \
+			./$(NAME) "$$map" && echo "⚠️  Expected failure but passed bonus: $$map" || echo "✅ Correctly failed bonus: $$map"; \
+		fi; \
+	done
+	@if [ -z "$$(ls tests/maps/bonus/bad/*.cub 2>/dev/null)" ]; then \
+		echo "⚠️  No bonus .cub files found in tests/maps/bonus/bad/"; \
+	fi
+	@echo ""
+	@echo "🏁 Bonus test suite completed!"
+
 
 .PHONY: all clean fclean re bonus libft minilibx test
