@@ -23,6 +23,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "../includes/cub3d.h"
+#include "../includes/cub3d_render.h"
 #include "../includes/parse_textures.h"
 #include "../includes/parse_map.h"
 #include "../includes/debug.h"
@@ -32,9 +33,7 @@
 #include <string.h>
 #include <mlx.h>
 
-#define WIDTH 1248
-#define HEIGHT 960
-#define IS_BONUS 1
+#define IS_BONUS 0
 
 void	init_player(t_cub3d *cub);
 int		handle_key_press(int key, t_cub3d *cub);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d_render.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 11:55:47 by skyce11           #+#    #+#             */
-/*   Updated: 2025/10/22 16:06:35 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 12:08:50 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,8 +162,6 @@ void		copy_image_to_buffer(char *data, int bpp,
 				int *buffer, long count);
 int			*load_xpm_err(void *mlx, void *img,
 				const char *fmt, const char *path);
-int			*load_xpm_buffer(void *mlx, const char *path,
-				int *width, int *height);
 
 void		init_door_textures_array(t_cub3d *cub);
 void		load_door_frames(t_cub3d *cub, void *mlx, int *w, int *h);
