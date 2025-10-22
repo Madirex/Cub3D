@@ -2,6 +2,10 @@
 
 **Cub3D** is a 3D graphical project inspired by the legendary **Wolfenstein 3D**, developed as part of the 42 curriculum. It uses raycasting to render a 3D world based on a 2D map.
 
+<p align="center">
+  <img src="images/img.png"/>
+</p>
+
 ## 📁 Project Structure
 
 ```
