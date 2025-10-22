@@ -33,7 +33,7 @@
 #include <string.h>
 #include <mlx.h>
 
-#define IS_BONUS 0
+#define IS_BONUS 1
 
 void	init_player(t_cub3d *cub);
 int		handle_key_press(int key, t_cub3d *cub);
