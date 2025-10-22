@@ -20,98 +20,12 @@
 
 #include "../../includes/cub3d.h"
 #include "../../includes/utils.h"
+#include "../../includes/validation_map_utils.h"
 
 void	find_player_position(t_cub3d *cub);
 
 /**
- * @brief Checks if a position is at the border of the map
- * 
- * @param cub Pointer to the main Cub3D structure
- * @param x X coordinate to check
- * @param y Y coordinate to check
- * @return 1 if position is at border, 0 otherwise
- */
-static int	is_border_position(t_cub3d *cub, int x, int y)
-{
-	return (y == 0 || y == cub->map_height - 1
-		|| x == 0 || x >= (int)ft_strlen(cub->map[y]) - 1);
-}
-
-/**
- * @brief Recursive flood fill algorithm to validate map enclosure
- * 
- * Uses flood fill to check that all accessible areas are properly
- * enclosed by walls, ensuring no open borders exist.
- * 
- * @param cub Pointer to the main Cub3D structure
- * @param visited 2D array tracking visited positions
- * @param x Current X coordinate
- * @param y Current Y coordinate
- */
-static void	flood_fill(t_cub3d *cub, int **visited, int x, int y)
-{
-	if (y < 0 || y >= cub->map_height || x < 0)
-		return ;
-	if (x >= (int)ft_strlen(cub->map[y]))
-		return ;
-	if (visited[y][x] || cub->map[y][x] == '1')
-		return ;
-	if (cub->map[y][x] == ' ')
-	{
-		if (is_border_position(cub, x, y))
-			return ;
-	}
-	if (is_border_position(cub, x, y) && cub->map[y][x]
-			!= '1' && cub->map[y][x] != ' ')
-		ft_error("Map is not closed by walls", cub, NULL);
-	visited[y][x] = 1;
-	flood_fill(cub, visited, x + 1, y);
-	flood_fill(cub, visited, x - 1, y);
-	flood_fill(cub, visited, x, y + 1);
-	flood_fill(cub, visited, x, y - 1);
-}
-
-/**
- * @brief Handles memory allocation failure for visited array
- * 
- * Cleans up partially allocated visited array and exits with error.
- * 
- * @param visited Partially allocated visited array
- * @param i Number of successfully allocated rows
- * @param cub Pointer to the main Cub3D structure
- */
-static void	handle_visited_allocation_failure(
-				int **visited, int i, t_cub3d *cub)
-{
-	while (--i >= 0)
-		free(visited[i]);
-	free(visited);
-	ft_error("Memory allocation failed for map validation", cub, NULL);
-}
-
-/**
- * @brief Checks if a given position (x, y) is within the map boundaries.
- *
- * @param cub Pointer to the main Cub3D structure.
- * @param x X coordinate.
- * @param y Y coordinate.
- * @return 1 if inside, 0 otherwise.
- */
-static int	is_valid_position(t_cub3d *cub, int x, int y)
-{
-	if (y < 0 || y >= cub->map_height || x < 0)
-		return (0);
-	if (x >= (int)ft_strlen(cub->map[y]))
-		return (0);
-	return (1);
-}
-
-/**
- * @brief Validates if a door ('D') at (x, y) is correctly enclosed.
- *
- * A door must be surrounded by '1' (walls) or map boundaries,
- * allowing '0', 'N', 'S', 'E', 'W', or ' '
- * only on two opposing sides (horizontally or vertically).
+ * @brief Validates that a door at (x, y) is properly enclosed by walls/spaces.
  *
  * @param cub Pointer to the main Cub3D structure.
  * @param x X coordinate of the door.
@@ -119,44 +33,26 @@ static int	is_valid_position(t_cub3d *cub, int x, int y)
  */
 static void	validate_door_enclosure(t_cub3d *cub, int x, int y)
 {
-	int	is_horizontal_gap;
-	int	is_vertical_gap;
+	int	orientation;
 
-	is_horizontal_gap = (is_valid_position(cub, x - 1, y)
-			&& ft_strchr("0NSEW ", cub->map[y][x - 1]))
-		&& (is_valid_position(cub, x + 1, y)
-			&& ft_strchr("0NSEW ", cub->map[y][x + 1]));
-	is_vertical_gap = (is_valid_position(cub, x, y - 1)
-			&& ft_strchr("0NSEW ", cub->map[y - 1][x]))
-		&& (is_valid_position(cub, x, y + 1)
-			&& ft_strchr("0NSEW ", cub->map[y + 1][x]));
-	if (!(is_horizontal_gap ^ is_vertical_gap))
-		ft_error("Door is not properly enclosed by walls", cub, NULL);
-	if (is_horizontal_gap)
+	orientation = check_door_orientation(cub, x, y);
+	if (orientation == 0)
 	{
 		if (is_valid_position(cub, x, y - 1) && cub->map[y - 1][x] != '1'
 			&& cub->map[y - 1][x] != ' ')
-			ft_error(
-				"Door must have a wall/space above it for horizontal opening",
-				cub, NULL);
+			ft_error("Door must have a wall/space above it", cub, NULL);
 		if (is_valid_position(cub, x, y + 1) && cub->map[y + 1][x] != '1'
 			&& cub->map[y + 1][x] != ' ')
-			ft_error(
-				"Door must have a wall/space below it for horizontal opening",
-				cub, NULL);
+			ft_error("Door must have a wall/space below it", cub, NULL);
 	}
-	else if (is_vertical_gap)
+	else
 	{
 		if (is_valid_position(cub, x - 1, y) && cub->map[y][x - 1] != '1'
 			&& cub->map[y][x - 1] != ' ')
-			ft_error(
-				"Door must have a wall/space to its left for vertical opening",
-				cub, NULL);
+			ft_error("Door must have a wall/space to its left", cub, NULL);
 		if (is_valid_position(cub, x + 1, y) && cub->map[y][x + 1] != '1'
 			&& cub->map[y][x + 1] != ' ')
-			ft_error(
-				"Door must have a wall/soace to its right for vertical opening",
-				cub, NULL);
+			ft_error("Door must have a wall/space to its right", cub, NULL);
 	}
 }
 
@@ -185,24 +81,19 @@ static void	validate_doors(t_cub3d *cub)
 }
 
 /**
- * @brief Main function to validate the parsed map
+ * @brief Allocates a 2D array to track visited positions during flood fill
  * 
- * Validates that the map exists, finds the player position,
- * and uses flood fill to ensure the map is properly enclosed by walls.
+ * Allocates memory for a 2D array of integers initialized to zero,
+ * representing whether each position in the map has been visited.
  * 
- * @param cub Pointer to the main Cub3D structure containing the map
+ * @param cub Pointer to the main Cub3D structure
+ * @return Pointer to the allocated 2D visited array
  */
-void	validate_map(t_cub3d *cub)
+static int	**allocate_visited(t_cub3d *cub)
 {
 	int	**visited;
 	int	i;
-	int	y;
-	int	x;
 
-	if (!cub->map || cub->map_height == 0)
-		ft_error("No map found", cub, NULL);
-	find_player_position(cub);
-	validate_doors(cub);
 	visited = (int **)malloc(sizeof(int *) * cub->map_height);
 	if (!visited)
 		ft_error("Memory allocation failed for map validation", cub, NULL);
@@ -214,6 +105,23 @@ void	validate_map(t_cub3d *cub)
 			handle_visited_allocation_failure(visited, i, cub);
 		i++;
 	}
+	return (visited);
+}
+
+/**
+ * @brief Initiates flood fill on all step characters in the map
+ * 
+ * Iterates through the map and starts flood fill from each
+ * step character that hasn't been visited yet.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ * @param visited 2D array tracking visited positions
+ */
+static void	flood_fill_map(t_cub3d *cub, int **visited)
+{
+	int	y;
+	int	x;
+
 	y = 0;
 	while (y < cub->map_height)
 	{
@@ -226,6 +134,27 @@ void	validate_map(t_cub3d *cub)
 		}
 		y++;
 	}
+}
+
+/**
+ * @brief Validates the map structure and enclosure
+ * 
+ * Ensures the map is properly enclosed by walls using
+ * flood fill algorithm and validates door placements.
+ * 
+ * @param cub Pointer to the main Cub3D structure
+ */
+void	validate_map(t_cub3d *cub)
+{
+	int	**visited;
+	int	i;
+
+	if (!cub->map || cub->map_height == 0)
+		ft_error("No map found", cub, NULL);
+	find_player_position(cub);
+	validate_doors(cub);
+	visited = allocate_visited(cub);
+	flood_fill_map(cub, visited);
 	i = 0;
 	while (i < cub->map_height)
 	{

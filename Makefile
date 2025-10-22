@@ -16,6 +16,7 @@ SRC_FILES   = main \
 			  debug/debug_print \
 			  validations/validate_map \
 			  validations/validation_utils \
+			  validations/validation_map_utils \
 			  loader/map_loader \
 			  loader/texture_loader \
 			  utils/utils \
