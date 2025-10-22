@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/22 14:31:09 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:31:10 by migonzal         ###   ########.fr       */
+/*   Created: 2025/10/22 11:55:47 by skyce11           #+#    #+#             */
+/*   Updated: 2025/10/22 15:08:42 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,18 @@
 # define COLOR_FLOOR 0x808080
 # define COLOR_PLAYER 0xFF0000
 # define COLOR_EMPTY 0x000000
+
+/*
+** Image info returned by mlx_get_data_addr.
+** Moved here so loader helpers can use it without declaring their own types.
+*/
+typedef struct s_img_info
+{
+	char	*data;
+	int		bpp;
+	int		size_line;
+	int	endian;
+}				t_img_info;
 
 typedef struct s_col_geom
 {
@@ -144,7 +156,24 @@ typedef struct s_render_ctx
 	int				*tex_buf;
 }				t_render_ctx;
 
+/* prototypes (parameter names use snake_case) */
 
+/* loader (textures) */
+
+void	copy_image_to_buffer(char *data, int bpp, int *buffer, long count);
+int		*load_xpm_err(void *mlx, void *img, const char *fmt, const char *path);
+int		*load_xpm_buffer(void *mlx, const char *path, int *width, int *height);
+
+void	init_door_textures_array(t_cub3d *cub);
+void	load_door_frames(t_cub3d *cub, void *mlx, int *w, int *h);
+void	set_door_open_texture(t_cub3d *cub, void *mlx, int *tmp_w, int *tmp_h);
+void	load_doors(t_cub3d *cub, void *mlx, int *w, int *h);
+
+void	load_walls(t_cub3d *cub, void *mlx, int *w, int *h);
+void	verify_wall_textures(t_cub3d *cub);
+
+/* Public loader API */
+void	load_wall_textures(t_cub3d *cub, void *mlx);
 
 /* utils */
 int		get_wall_texture(int side, double ray_dir_x, double ray_dir_y);
