@@ -6,7 +6,7 @@
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:30:47 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:34:23 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 16:27:45 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	get_target_cell_coords(t_cub3d *cub, double dist, int *tx, int *ty)
 	*ty = (int)(cub->pos_y + cub->dir_y * dist);
 	if (*ty < 0 || *ty >= cub->map_height)
 		return (0);
-	if (*tx < 0 || *tx >= (int)strlen(cub->map[*ty]))
+	if (*tx < 0 || *tx >= (int)ft_strlen(cub->map[*ty]))
 		return (0);
 	return (1);
 }

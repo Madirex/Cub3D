@@ -6,7 +6,7 @@
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:30:03 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:35:52 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 16:27:36 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	*select_texture_buffer(t_cub3d *cub, t_tex_query *q)
 		neighbor_y = q->map_y - q->step_y;
 	is_door_adjacent = 0;
 	if (cub->is_bonus && neighbor_y >= 0 && neighbor_y < cub->map_height
-		&& neighbor_x >= 0 && neighbor_x < (int)strlen(cub->map[neighbor_y])
+		&& neighbor_x >= 0 && neighbor_x < (int)ft_strlen(cub->map[neighbor_y])
 		&& cub->map[neighbor_y][neighbor_x] == 'O'
 		&& cub->door_textures && cub->door_textures[1] != NULL)
 		is_door_adjacent = 1;

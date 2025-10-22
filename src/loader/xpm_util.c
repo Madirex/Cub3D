@@ -6,7 +6,7 @@
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 12:48:38 by skyce11           #+#    #+#             */
-/*   Updated: 2025/10/22 15:21:48 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 16:28:17 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	copy_image_to_buffer(char *data, int bpp, int *buffer, long count)
 	while (i < count)
 	{
 		src = (unsigned char *)data + (i * (bpp / 8));
-		memcpy(&buffer[i], src, sizeof(int));
+		ft_memcpy(&buffer[i], src, sizeof(int));
 		i++;
 	}
 }

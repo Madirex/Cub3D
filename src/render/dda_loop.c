@@ -6,7 +6,7 @@
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:30:51 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:38:06 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 16:27:05 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ int	perform_dda(t_cub3d *cub, t_dda_in *in, t_dda_out *out)
 		dda_step_update(in, out, &side_dist_x, &side_dist_y);
 		if (in->map_y < 0 || in->map_y >= cub->map_height
 			|| in->map_x < 0
-			|| in->map_x >= (int)strlen(cub->map[in->map_y]))
+			|| in->map_x >= (int)ft_strlen(cub->map[in->map_y]))
 			return (0);
 		if (cub->map[in->map_y][in->map_x] == '1'
 			|| (cub->is_bonus && cub->map[in->map_y][in->map_x] == 'D'))

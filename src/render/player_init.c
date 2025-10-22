@@ -6,7 +6,7 @@
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:30:18 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 16:14:48 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 16:27:26 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static int	scan_players(t_cub3d *cub, double *out_x,
 	while (y < cub->map_height)
 	{
 		x = 0;
-		while (x < (int)strlen(cub->map[y]))
+		while (x < (int)ft_strlen(cub->map[y]))
 		{
 			if (cub->map[y][x] == 'N' || cub->map[y][x] == 'S'
 				|| cub->map[y][x] == 'E' || cub->map[y][x] == 'W')
