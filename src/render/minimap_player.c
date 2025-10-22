@@ -1,9 +1,21 @@
-#include "../includes/cub3d_render.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minimap_player.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:31 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:39:35 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../includes/cub3d_render.h"
 
 /* Minimap composition and player drawing */
 
 /* Draw minimap rows around player using the context */
-void minimap_draw_cells(t_minimap_ctx *ctx)
+void	minimap_draw_cells(t_minimap_ctx *ctx)
 {
 	int	i;
 
@@ -16,7 +28,8 @@ void minimap_draw_cells(t_minimap_ctx *ctx)
 }
 
 /* Draw small square representing the player on minimap */
-void minimap_draw_player_square(t_img *img, int player_pixel_x, int player_pixel_y)
+void	minimap_draw_player_square(t_img *img,
+	int player_pixel_x, int player_pixel_y)
 {
 	int	player_size;
 	int	y;
@@ -37,7 +50,8 @@ void minimap_draw_player_square(t_img *img, int player_pixel_x, int player_pixel
 }
 
 /* Draw simple direction indicator on minimap */
-void minimap_draw_player_dir(t_img *img, int player_pixel_x, int player_pixel_y, t_vec2 *dir)
+void	minimap_draw_player_dir(t_img *img, int player_pixel_x,
+	int player_pixel_y, t_vec2 *dir)
 {
 	int	dir_len;
 	int	dir_end_x;
@@ -56,11 +70,11 @@ void minimap_draw_player_dir(t_img *img, int player_pixel_x, int player_pixel_y,
 /* Compute the player pixel coords inside the minimap area.
 ** Returns a t_point to avoid out-parameters.
 */
-t_point minimap_compute_player_coords(t_minimap_ctx *ctx)
+t_point	minimap_compute_player_coords(t_minimap_ctx *ctx)
 {
-	t_point p;
-	int	player_center_x;
-	int	player_center_y;
+	t_point	p;
+	int		player_center_x;
+	int		player_center_y;
 	double	relative_x;
 	double	relative_y;
 
@@ -76,11 +90,11 @@ t_point minimap_compute_player_coords(t_minimap_ctx *ctx)
 }
 
 /* Public entrypoint to draw the minimap */
-void draw_minimap(t_cub3d *cub, t_img *img)
+void	draw_minimap(t_cub3d *cub, t_img *img)
 {
-	t_minimap_ctx ctx;
-	t_point p;
-	t_vec2 dir;
+	t_minimap_ctx	ctx;
+	t_point			p;
+	t_vec2			dir;
 
 	ctx.cub = cub;
 	ctx.img = img;

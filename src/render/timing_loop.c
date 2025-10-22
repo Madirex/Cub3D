@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   timing_loop.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:29:57 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:31:53 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/cub3d_render.h"
 #include <sys/time.h>
 #include <mlx.h>
@@ -5,7 +17,7 @@
 /* Time helpers, door animation update and render loop */
 
 /* Return current time in ms */
-long fn_get_time_in_ms(void)
+long	fn_get_time_in_ms(void)
 {
 	struct timeval	tv;
 
@@ -15,7 +27,7 @@ long fn_get_time_in_ms(void)
 }
 
 /* Update door animation frame based on timers */
-void update_door_animation(t_cub3d *cub)
+void	update_door_animation(t_cub3d *cub)
 {
 	if (!cub->is_bonus || !cub->door_textures)
 		return ;
@@ -28,7 +40,7 @@ void update_door_animation(t_cub3d *cub)
 }
 
 /* Main render loop called by MLX */
-int render_loop(t_cub3d *cub)
+int	render_loop(t_cub3d *cub)
 {
 	long	current_time;
 	t_img	img;

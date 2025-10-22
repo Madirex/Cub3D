@@ -1,14 +1,26 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   doors_prompt.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:43 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:38:39 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <mlx.h>
-#include "../includes/cub3d_render.h"
+#include "../../includes/cub3d_render.h"
 
 /* Door prompt helpers and rendering */
 
 /* Check near/far target logic used for drawing prompt.
 ** Returns a t_target with .ok == 1 when a valid target was found.
 */
-t_target check_near_far_target(t_cub3d *cub, double near_d, double far_d)
+t_target	check_near_far_target(t_cub3d *cub, double near_d, double far_d)
 {
-	t_target t;
+	t_target	t;
 
 	t.ok = 0;
 	if (!get_target_cell_coords(cub, near_d, &t.x, &t.y))
@@ -23,7 +35,7 @@ t_target check_near_far_target(t_cub3d *cub, double near_d, double far_d)
 }
 
 /* Return prompt string based on door cell state */
-const char *select_door_message(char cell)
+const char	*select_door_message(char cell)
 {
 	if (cell == 'D')
 		return ("Press SPACE to open");
@@ -31,11 +43,11 @@ const char *select_door_message(char cell)
 }
 
 /* Draw door prompt on screen if applicable */
-void draw_door_prompt(t_cub3d *cub)
+void	draw_door_prompt(t_cub3d *cub)
 {
-	t_target tgt;
-	const char *message;
-	char target_cell;
+	t_target	tgt;
+	const char	*message;
+	char		target_cell;
 
 	tgt = check_near_far_target(cub, 0.75, 1.5);
 	if (!tgt.ok)

@@ -1,83 +1,93 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   dda_loop.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:51 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:38:06 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/cub3d_render.h"
 #include <math.h>
-
-/*
-** DDA loop helpers and main DDA routine (kept in a separate TU to respect
-** the limit on number of functions per file).
-*/
+#include <string.h>
 
 /* Perform one DDA step update */
-void dda_step_update(t_dda_in *in, t_dda_out *out, double *sideDistX, double *sideDistY)
+void	dda_step_update(t_dda_in *in, t_dda_out *out,
+	double *side_dist_x, double *side_dist_y)
 {
-	double	invRx;
-	double	invRy;
+	double	inv_rx;
+	double	inv_ry;
 
-	if (*sideDistX < *sideDistY)
+	if (*side_dist_x < *side_dist_y)
 	{
-		if (in->rayDirX == 0)
-			invRx = 1e30;
+		if (in->ray_dir_x == 0)
+			inv_rx = 1e30;
 		else
-			invRx = 1.0 / in->rayDirX;
-		*sideDistX += fabs(invRx);
-		in->mapX += out->stepX;
+			inv_rx = 1.0 / in->ray_dir_x;
+		*side_dist_x += fabs(inv_rx);
+		in->map_x += out->step_x;
 		out->side = 0;
 	}
 	else
 	{
-		if (in->rayDirY == 0)
-			invRy = 1e30;
+		if (in->ray_dir_y == 0)
+			inv_ry = 1e30;
 		else
-			invRy = 1.0 / in->rayDirY;
-		*sideDistY += fabs(invRy);
-		in->mapY += out->stepY;
+			inv_ry = 1.0 / in->ray_dir_y;
+		*side_dist_y += fabs(inv_ry);
+		in->map_y += out->step_y;
 		out->side = 1;
 	}
 }
 
 /* Compute perpendicular wall distance for hit */
-void compute_perp_wall_dist(t_dda_in *in, t_dda_out *out, double sideDistX, double sideDistY)
+void	compute_perp_wall_dist(t_dda_in *in, t_dda_out *out,
+	double side_dist_x, double side_dist_y)
 {
 	double	inv;
 
 	if (out->side == 0)
 	{
-		if (in->rayDirX == 0)
+		if (in->ray_dir_x == 0)
 			inv = 1e30;
 		else
-			inv = 1.0 / in->rayDirX;
-		out->perpWallDist = sideDistX - fabs(inv);
+			inv = 1.0 / in->ray_dir_x;
+		out->perp_wall_dist = side_dist_x - fabs(inv);
 	}
 	else
 	{
-		if (in->rayDirY == 0)
+		if (in->ray_dir_y == 0)
 			inv = 1e30;
 		else
-			inv = 1.0 / in->rayDirY;
-		out->perpWallDist = sideDistY - fabs(inv);
+			inv = 1.0 / in->ray_dir_y;
+		out->perp_wall_dist = side_dist_y - fabs(inv);
 	}
 }
 
 /* Perform the DDA loop and detect wall/door hit */
-int perform_dda(t_cub3d *cub, t_dda_in *in, t_dda_out *out)
+int	perform_dda(t_cub3d *cub, t_dda_in *in, t_dda_out *out)
 {
-	double	sideDistX;
-	double	sideDistY;
-	t_dda_side sides;
+	double		side_dist_x;
+	double		side_dist_y;
+	t_dda_side	sides;
 
 	sides = init_dda_steps(cub, in, out);
-	sideDistX = sides.sx;
-	sideDistY = sides.sy;
+	side_dist_x = sides.sx;
+	side_dist_y = sides.sy;
 	while (1)
 	{
-		dda_step_update(in, out, &sideDistX, &sideDistY);
-		if (in->mapY < 0 || in->mapY >= cub->map_height
-			|| in->mapX < 0
-			|| in->mapX >= (int)strlen(cub->map[in->mapY]))
+		dda_step_update(in, out, &side_dist_x, &side_dist_y);
+		if (in->map_y < 0 || in->map_y >= cub->map_height
+			|| in->map_x < 0
+			|| in->map_x >= (int)strlen(cub->map[in->map_y]))
 			return (0);
-		if (cub->map[in->mapY][in->mapX] == '1'
-			|| (cub->is_bonus && cub->map[in->mapY][in->mapX] == 'D'))
+		if (cub->map[in->map_y][in->map_x] == '1'
+			|| (cub->is_bonus && cub->map[in->map_y][in->map_x] == 'D'))
 		{
-			compute_perp_wall_dist(in, out, sideDistX, sideDistY);
+			compute_perp_wall_dist(in, out, side_dist_x, side_dist_y);
 			return (1);
 		}
 	}

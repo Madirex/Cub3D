@@ -1,68 +1,80 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   movement.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:26 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:42:29 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/cub3d_render.h"
 #include <math.h>
 
 /* Movement and rotation helpers and orchestrator */
 
 /* Move forward with collision checks */
-void move_forward(t_cub3d *cub, double move_speed_dt)
+void	move_forward(t_cub3d *cub, double move_speed_dt)
 {
 	if (IS_FLOOR(cub->map[(int)(cub->pos_y)]
-			[(int)(cub->pos_x + cub->dir_x * move_speed_dt)]))
+		[(int)(cub->pos_x + cub->dir_x * move_speed_dt)]))
 		cub->pos_x += cub->dir_x * move_speed_dt;
 	if (IS_FLOOR(cub->map[(int)(cub->pos_y + cub->dir_y * move_speed_dt)]
-			[(int)(cub->pos_x)]))
+		[(int)(cub->pos_x)]))
 		cub->pos_y += cub->dir_y * move_speed_dt;
 }
 
 /* Move backward with collision checks */
-void move_backward(t_cub3d *cub, double move_speed_dt)
+void	move_backward(t_cub3d *cub, double move_speed_dt)
 {
 	if (IS_FLOOR(cub->map[(int)(cub->pos_y)]
-			[(int)(cub->pos_x - cub->dir_x * move_speed_dt)]))
+		[(int)(cub->pos_x - cub->dir_x * move_speed_dt)]))
 		cub->pos_x -= cub->dir_x * move_speed_dt;
 	if (IS_FLOOR(cub->map[(int)(cub->pos_y - cub->dir_y * move_speed_dt)]
-			[(int)(cub->pos_x)]))
+		[(int)(cub->pos_x)]))
 		cub->pos_y -= cub->dir_y * move_speed_dt;
 }
 
 /* Rotate right by angle (used by perform_movements) */
-void rotate_right(t_cub3d *cub, double rot_speed_dt)
+void	rotate_right(t_cub3d *cub, double rot_speed_dt)
 {
-	double	oldDirX;
-	double	oldPlaneX;
+	double	old_dir_x;
+	double	old_plane_x;
 
-	oldDirX = cub->dir_x;
+	old_dir_x = cub->dir_x;
 	cub->dir_x = cub->dir_x * cos(rot_speed_dt)
 		- cub->dir_y * sin(rot_speed_dt);
-	cub->dir_y = oldDirX * sin(rot_speed_dt)
+	cub->dir_y = old_dir_x * sin(rot_speed_dt)
 		+ cub->dir_y * cos(rot_speed_dt);
-	oldPlaneX = cub->plane_x;
+	old_plane_x = cub->plane_x;
 	cub->plane_x = cub->plane_x * cos(rot_speed_dt)
 		- cub->plane_y * sin(rot_speed_dt);
-	cub->plane_y = oldPlaneX * sin(rot_speed_dt)
+	cub->plane_y = old_plane_x * sin(rot_speed_dt)
 		+ cub->plane_y * cos(rot_speed_dt);
 }
 
 /* Rotate left by angle (used by perform_movements) */
-void rotate_left(t_cub3d *cub, double rot_speed_dt)
+void	rotate_left(t_cub3d *cub, double rot_speed_dt)
 {
-	double	oldDirX;
-	double	oldPlaneX;
+	double	old_dir_x;
+	double	old_plane_x;
 
-	oldDirX = cub->dir_x;
+	old_dir_x = cub->dir_x;
 	cub->dir_x = cub->dir_x * cos(-rot_speed_dt)
 		- cub->dir_y * sin(-rot_speed_dt);
-	cub->dir_y = oldDirX * sin(-rot_speed_dt)
+	cub->dir_y = old_dir_x * sin(-rot_speed_dt)
 		+ cub->dir_y * cos(-rot_speed_dt);
-	oldPlaneX = cub->plane_x;
+	old_plane_x = cub->plane_x;
 	cub->plane_x = cub->plane_x * cos(-rot_speed_dt)
 		- cub->plane_y * sin(-rot_speed_dt);
-	cub->plane_y = oldPlaneX * sin(-rot_speed_dt)
+	cub->plane_y = old_plane_x * sin(-rot_speed_dt)
 		+ cub->plane_y * cos(-rot_speed_dt);
 }
 
 /* Called every frame to apply movement/rotation flags */
-void perform_movements(t_cub3d *cub)
+void	perform_movements(t_cub3d *cub)
 {
 	double	move_speed_dt;
 	double	rot_speed_dt;

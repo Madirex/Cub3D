@@ -1,24 +1,34 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   raycast_utils.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:11 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:32:29 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/cub3d_render.h"
 #include <stdlib.h>
 
-/* Small helpers moved from original raycast.c - now exported */
-
 /* Return wall texture index based on side and ray direction */
-int get_wall_texture(int side, double rayDirX, double rayDirY)
+int	get_wall_texture(int side, double ray_dir_x, double ray_dir_y)
 {
 	if (side == 0)
 	{
-		if (rayDirX > 0)
+		if (ray_dir_x > 0)
 			return (2);
 		return (3);
 	}
-	if (rayDirY > 0)
+	if (ray_dir_y > 0)
 		return (1);
 	return (0);
 }
 
 /* Convert rgb components to packed int */
-int rgb_to_int(int r, int g, int b)
+int	rgb_to_int(int r, int g, int b)
 {
 	return (((r & 0xFF) << 16)
 		| ((g & 0xFF) << 8)
@@ -26,7 +36,7 @@ int rgb_to_int(int r, int g, int b)
 }
 
 /* Pixel helper: uses t_img to avoid passing multiple args */
-void draw_pixel(t_img *img, int x, int y, int color)
+void	draw_pixel(t_img *img, int x, int y, int color)
 {
 	unsigned int	*pixel;
 	unsigned char	*addr;

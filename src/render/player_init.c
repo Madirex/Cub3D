@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   player_init.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:18 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:32:40 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/cub3d_render.h"
 #include <string.h>
 #include <math.h>
@@ -5,7 +17,7 @@
 /* Find player start on the map and initialize player state */
 
 /* Search map for player start and set pos+dir */
-int find_player_position(t_cub3d *cub)
+int	find_player_position(t_cub3d *cub)
 {
 	int	y;
 	int	x;
@@ -32,14 +44,14 @@ int find_player_position(t_cub3d *cub)
 }
 
 /* Public init wrapper */
-void init_player(t_cub3d *cub)
+void	init_player(t_cub3d *cub)
 {
 	(void)find_player_position;
 	find_player_position(cub);
 }
 
 /* Rotate player by angle (used by mouse handler) */
-void rotate_player(t_cub3d *cub, double angle)
+void	rotate_player(t_cub3d *cub, double angle)
 {
 	double	old_dir_x;
 	double	old_plane_x;

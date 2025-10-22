@@ -1,10 +1,22 @@
-#include "../includes/cub3d_render.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minimap_cells.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:35 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:38:51 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../includes/cub3d_render.h"
 #include <string.h>
 
 /* Minimap helpers: cell color and cell drawing */
 
 /* Determine cell color based on map content */
-int minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
+int	minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
 {
 	char	cell;
 
@@ -23,7 +35,7 @@ int minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
 }
 
 /* Fill entire minimap cell area with a color */
-void minimap_fill_cell(t_img *img, int base_x, int base_y, int color)
+void	minimap_fill_cell(t_img *img, int base_x, int base_y, int color)
 {
 	int	px;
 	int	py;
@@ -42,7 +54,7 @@ void minimap_fill_cell(t_img *img, int base_x, int base_y, int color)
 }
 
 /* Draw top and left border of a minimap cell */
-void minimap_draw_border(t_img *img, int draw_x, int draw_y)
+void	minimap_draw_border(t_img *img, int draw_x, int draw_y)
 {
 	int	i;
 
@@ -56,7 +68,7 @@ void minimap_draw_border(t_img *img, int draw_x, int draw_y)
 }
 
 /* Draw a whole cell (fill + border) */
-void minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
+void	minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
 {
 	minimap_fill_cell(img, draw_x, draw_y, color);
 	minimap_draw_border(img, draw_x, draw_y);
@@ -65,9 +77,9 @@ void minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
 /* Draw one row of minimap cells relative to player.
 ** Now accepts a single context pointer to respect parameter limit.
 */
-void minimap_draw_row(t_minimap_ctx *ctx, int i)
+void	minimap_draw_row(t_minimap_ctx *ctx, int i)
 {
-	t_minimap_row_ctx lctx;
+	t_minimap_row_ctx	lctx;
 
 	lctx.j = -MINIMAP_VIEW_RADIUS;
 	while (lctx.j <= MINIMAP_VIEW_RADIUS)
