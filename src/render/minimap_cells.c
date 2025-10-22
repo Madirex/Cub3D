@@ -6,7 +6,7 @@
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:30:35 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:38:51 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 15:30:52 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
 	cell = cub->map[map_y][map_x];
 	if (cell == '1' || cell == 'D')
 		return (COLOR_WALL);
-	if (IS_FLOOR(cell))
+	if (is_floor(cell))
 		return (COLOR_FLOOR);
 	return (COLOR_EMPTY);
 }

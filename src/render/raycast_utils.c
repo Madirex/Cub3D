@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/22 14:30:11 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:32:29 by migonzal         ###   ########.fr       */
+/*   Created: 2025/10/22 12:40:00 by skyce11           #+#    #+#             */
+/*   Updated: 2025/10/22 15:31:11 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/cub3d_render.h"
+#include "../includes/cub3d_render.h"
 #include <stdlib.h>
 
 /* Return wall texture index based on side and ray direction */
@@ -48,4 +48,13 @@ void	draw_pixel(t_img *img, int x, int y, int color)
 	addr += x * img->bytes_per_pixel;
 	pixel = (unsigned int *)addr;
 	*pixel = (unsigned int)color;
+}
+
+/*
+** If character is floor/empty/player
+*/
+int	is_floor(char c)
+{
+	return (c == '0' || c == 'N' || c == 'S'
+		|| c == 'E' || c == 'W' || c == 'O');
 }

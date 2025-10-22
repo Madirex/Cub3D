@@ -6,11 +6,23 @@
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:30:26 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:42:29 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 15:38:57 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/cub3d_render.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   movement.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:26 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:33:13 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/cub3d_render.h"
 #include <math.h>
 
 /* Movement and rotation helpers and orchestrator */
@@ -18,10 +30,10 @@
 /* Move forward with collision checks */
 void	move_forward(t_cub3d *cub, double move_speed_dt)
 {
-	if (IS_FLOOR(cub->map[(int)(cub->pos_y)]
+	if (is_floor(cub->map[(int)(cub->pos_y)]
 		[(int)(cub->pos_x + cub->dir_x * move_speed_dt)]))
 		cub->pos_x += cub->dir_x * move_speed_dt;
-	if (IS_FLOOR(cub->map[(int)(cub->pos_y + cub->dir_y * move_speed_dt)]
+	if (is_floor(cub->map[(int)(cub->pos_y + cub->dir_y * move_speed_dt)]
 		[(int)(cub->pos_x)]))
 		cub->pos_y += cub->dir_y * move_speed_dt;
 }
@@ -29,10 +41,10 @@ void	move_forward(t_cub3d *cub, double move_speed_dt)
 /* Move backward with collision checks */
 void	move_backward(t_cub3d *cub, double move_speed_dt)
 {
-	if (IS_FLOOR(cub->map[(int)(cub->pos_y)]
+	if (is_floor(cub->map[(int)(cub->pos_y)]
 		[(int)(cub->pos_x - cub->dir_x * move_speed_dt)]))
 		cub->pos_x -= cub->dir_x * move_speed_dt;
-	if (IS_FLOOR(cub->map[(int)(cub->pos_y - cub->dir_y * move_speed_dt)]
+	if (is_floor(cub->map[(int)(cub->pos_y - cub->dir_y * move_speed_dt)]
 		[(int)(cub->pos_x)]))
 		cub->pos_y -= cub->dir_y * move_speed_dt;
 }
