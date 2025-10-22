@@ -22,7 +22,21 @@ SRC_FILES   = main \
 			  utils/utils \
 			  utils/assign_utils \
 			  utils/map_utils \
-			  render/raycast
+			  render/column_render \
+			  render/dda \
+			  render/doors_logic \
+			  render/doors_prompt \
+			  render/keyboard_mouse \
+			  render/minimap_cells \
+			  render/minimap_player \
+			  render/movement \
+			  render/player_dirs \
+			  render/player_init \
+			  render/textures_and_columns \
+			  render/timing_loop \
+			  render/raycast_utils \
+
+
 
 
 OBJS        = $(addprefix $(OBJS_DIR), $(addsuffix .o, $(SRC_FILES)))
