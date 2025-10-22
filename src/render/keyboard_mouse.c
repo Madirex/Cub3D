@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   keyboard_mouse.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:39 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:33:58 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/cub3d_render.h"
 
 /* Input callbacks (keyboard & mouse) */
 
 /* Key press handler */
-int handle_key_press(int key, t_cub3d *cub)
+int	handle_key_press(int key, t_cub3d *cub)
 {
 	if (key == 119)
 		cub->is_moving_forward = 1;
@@ -21,7 +33,7 @@ int handle_key_press(int key, t_cub3d *cub)
 }
 
 /* Key release handler */
-int handle_key_release(int key, t_cub3d *cub)
+int	handle_key_release(int key, t_cub3d *cub)
 {
 	if (key == 119)
 		cub->is_moving_forward = 0;
@@ -35,7 +47,7 @@ int handle_key_release(int key, t_cub3d *cub)
 }
 
 /* Mouse move handler: rotate player based on delta X */
-int handle_mouse_move(int x, int y, t_cub3d *cub)
+int	handle_mouse_move(int x, int y, t_cub3d *cub)
 {
 	int		delta_x;
 	double	rotation_angle;

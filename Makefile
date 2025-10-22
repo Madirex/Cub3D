@@ -18,12 +18,16 @@ SRC_FILES   = main \
 			  validations/validation_utils \
 			  validations/validation_map_utils \
 			  loader/map_loader \
+			  loader/doors_loader \
+			  loader/wall_loader \
+			  loader/xpm_util \
 			  loader/texture_loader \
 			  utils/utils \
 			  utils/assign_utils \
 			  utils/map_utils \
 			  render/column_render \
-			  render/dda \
+			  render/dda_init \
+			  render/dda_loop \
 			  render/doors_logic \
 			  render/doors_prompt \
 			  render/keyboard_mouse \

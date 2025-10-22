@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minimap_cells.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:30:35 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 16:27:14 by migonzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/cub3d_render.h"
 #include <string.h>
 
 /* Minimap helpers: cell color and cell drawing */
 
 /* Determine cell color based on map content */
-int minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
+int	minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
 {
 	char	cell;
 
@@ -12,18 +24,18 @@ int minimap_cell_color(t_cub3d *cub, int map_y, int map_x)
 		return (COLOR_EMPTY);
 	if (map_x < 0 || cub->map[map_y] == NULL)
 		return (COLOR_EMPTY);
-	if (map_x >= (int)strlen(cub->map[map_y]))
+	if (map_x >= (int)ft_strlen(cub->map[map_y]))
 		return (COLOR_EMPTY);
 	cell = cub->map[map_y][map_x];
 	if (cell == '1' || cell == 'D')
 		return (COLOR_WALL);
-	if (IS_FLOOR(cell))
+	if (is_floor(cell))
 		return (COLOR_FLOOR);
 	return (COLOR_EMPTY);
 }
 
 /* Fill entire minimap cell area with a color */
-void minimap_fill_cell(t_img *img, int base_x, int base_y, int color)
+void	minimap_fill_cell(t_img *img, int base_x, int base_y, int color)
 {
 	int	px;
 	int	py;
@@ -42,7 +54,7 @@ void minimap_fill_cell(t_img *img, int base_x, int base_y, int color)
 }
 
 /* Draw top and left border of a minimap cell */
-void minimap_draw_border(t_img *img, int draw_x, int draw_y)
+void	minimap_draw_border(t_img *img, int draw_x, int draw_y)
 {
 	int	i;
 
@@ -56,26 +68,32 @@ void minimap_draw_border(t_img *img, int draw_x, int draw_y)
 }
 
 /* Draw a whole cell (fill + border) */
-void minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
+void	minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
 {
 	minimap_fill_cell(img, draw_x, draw_y, color);
 	minimap_draw_border(img, draw_x, draw_y);
 }
 
-/* Draw one row of minimap cells relative to player */
-void minimap_draw_row(t_cub3d *cub, t_img *img, int i, int start_x, int start_y)
+/* Draw one row of minimap cells relative to player.
+** Now accepts a single context pointer to respect parameter limit.
+*/
+void	minimap_draw_row(t_minimap_ctx *ctx, int i)
 {
-	t_minimap_row_ctx ctx;
+	t_minimap_row_ctx	lctx;
 
-	ctx.j = -MINIMAP_VIEW_RADIUS;
-	while (ctx.j <= MINIMAP_VIEW_RADIUS)
+	lctx.j = -MINIMAP_VIEW_RADIUS;
+	while (lctx.j <= MINIMAP_VIEW_RADIUS)
 	{
-		ctx.map_cell_x = (int)cub->pos_x + ctx.j;
-		ctx.map_cell_y = (int)cub->pos_y + i;
-		ctx.cell_draw_x = start_x + (ctx.j + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
-		ctx.cell_draw_y = start_y + (i + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
-		ctx.color = minimap_cell_color(cub, ctx.map_cell_y, ctx.map_cell_x);
-		minimap_draw_cell(img, ctx.cell_draw_x, ctx.cell_draw_y, ctx.color);
-		ctx.j++;
+		lctx.map_cell_x = (int)ctx->cub->pos_x + lctx.j;
+		lctx.map_cell_y = (int)ctx->cub->pos_y + i;
+		lctx.cell_draw_x = ctx->start_x
+			+ (lctx.j + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
+		lctx.cell_draw_y = ctx->start_y
+			+ (i + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
+		lctx.color = minimap_cell_color(ctx->cub, lctx.map_cell_y,
+				lctx.map_cell_x);
+		minimap_draw_cell(ctx->img, lctx.cell_draw_x, lctx.cell_draw_y,
+			lctx.color);
+		lctx.j++;
 	}
 }
