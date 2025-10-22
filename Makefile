@@ -119,8 +119,6 @@ test: $(NAME)
 	@echo "🏁 Test suite completed!"
 
 test-bonus: $(NAME)
-	@$(MAKE) test
-	@echo ""
 	@echo "🟡 Bonus tests - Good maps"
 	@echo "========================="
 	@for map in tests/maps/bonus/good/*.cub; do \
