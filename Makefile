@@ -118,4 +118,34 @@ test: $(NAME)
 	@echo ""
 	@echo "🏁 Test suite completed!"
 
+test-bonus: $(NAME)
+	@$(MAKE) test
+	@echo ""
+	@echo "🟡 Bonus tests - Good maps"
+	@echo "========================="
+	@for map in tests/maps/bonus/good/*.cub; do \
+		if [ -f "$$map" ]; then \
+			echo "Testing bonus: $$map"; \
+			./$(NAME) "$$map" || echo "❌ Failed bonus: $$map"; \
+		fi; \
+	done
+	@if [ -z "$$(ls tests/maps/bonus/good/*.cub 2>/dev/null)" ]; then \
+		echo "⚠️  No bonus .cub files found in tests/maps/bonus/good/"; \
+	fi
+	@echo ""
+	@echo "🔶 Bonus tests - Bad maps"
+	@echo "========================="
+	@for map in tests/maps/bonus/bad/*.cub; do \
+		if [ -f "$$map" ]; then \
+			echo "Testing bonus: $$map"; \
+			./$(NAME) "$$map" && echo "⚠️  Expected failure but passed bonus: $$map" || echo "✅ Correctly failed bonus: $$map"; \
+		fi; \
+	done
+	@if [ -z "$$(ls tests/maps/bonus/bad/*.cub 2>/dev/null)" ]; then \
+		echo "⚠️  No bonus .cub files found in tests/maps/bonus/bad/"; \
+	fi
+	@echo ""
+	@echo "🏁 Bonus test suite completed!"
+
+
 .PHONY: all clean fclean re bonus libft minilibx test
