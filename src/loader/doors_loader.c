@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/cub3d_render.h"
+#include "../includes/parse_textures.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
