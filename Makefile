@@ -23,7 +23,8 @@ SRC_FILES   = main \
 			  utils/assign_utils \
 			  utils/map_utils \
 			  render/column_render \
-			  render/dda \
+			  render/dda_init \
+			  render/dda_loop \
 			  render/doors_logic \
 			  render/doors_prompt \
 			  render/keyboard_mouse \

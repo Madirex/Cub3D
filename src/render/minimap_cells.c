@@ -1,4 +1,4 @@
-#include "../../includes/cub3d_render.h"
+#include "../includes/cub3d_render.h"
 #include <string.h>
 
 /* Minimap helpers: cell color and cell drawing */
@@ -62,20 +62,26 @@ void minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color)
 	minimap_draw_border(img, draw_x, draw_y);
 }
 
-/* Draw one row of minimap cells relative to player */
-void minimap_draw_row(t_cub3d *cub, t_img *img, int i, int start_x, int start_y)
+/* Draw one row of minimap cells relative to player.
+** Now accepts a single context pointer to respect parameter limit.
+*/
+void minimap_draw_row(t_minimap_ctx *ctx, int i)
 {
-	t_minimap_row_ctx ctx;
+	t_minimap_row_ctx lctx;
 
-	ctx.j = -MINIMAP_VIEW_RADIUS;
-	while (ctx.j <= MINIMAP_VIEW_RADIUS)
+	lctx.j = -MINIMAP_VIEW_RADIUS;
+	while (lctx.j <= MINIMAP_VIEW_RADIUS)
 	{
-		ctx.map_cell_x = (int)cub->pos_x + ctx.j;
-		ctx.map_cell_y = (int)cub->pos_y + i;
-		ctx.cell_draw_x = start_x + (ctx.j + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
-		ctx.cell_draw_y = start_y + (i + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
-		ctx.color = minimap_cell_color(cub, ctx.map_cell_y, ctx.map_cell_x);
-		minimap_draw_cell(img, ctx.cell_draw_x, ctx.cell_draw_y, ctx.color);
-		ctx.j++;
+		lctx.map_cell_x = (int)ctx->cub->pos_x + lctx.j;
+		lctx.map_cell_y = (int)ctx->cub->pos_y + i;
+		lctx.cell_draw_x = ctx->start_x
+			+ (lctx.j + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
+		lctx.cell_draw_y = ctx->start_y
+			+ (i + MINIMAP_VIEW_RADIUS) * MINIMAP_SCALE;
+		lctx.color = minimap_cell_color(ctx->cub, lctx.map_cell_y,
+				lctx.map_cell_x);
+		minimap_draw_cell(ctx->img, lctx.cell_draw_x, lctx.cell_draw_y,
+			lctx.color);
+		lctx.j++;
 	}
 }

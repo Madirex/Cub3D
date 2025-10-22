@@ -1,4 +1,5 @@
 #include "../../includes/cub3d_render.h"
+#include <math.h>
 
 /* Movement and rotation helpers and orchestrator */
 

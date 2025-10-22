@@ -1,39 +1,57 @@
-#ifndef CUB3D_RENDER_H
-#define CUB3D_RENDER_H
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cub3d_render.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skyce11 <skyce11@student.42xxx>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 11:55:47 by skyce11           #+#    #+#             */
+/*   Updated: 2025/10/22 11:55:47 by skyce11          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-/* Core project header (must define t_cub3d, t_img and other project-wide types) */
-#include "cub3d.h"
+#ifndef CUB3D_RENDER_H
+# define CUB3D_RENDER_H
+
+/*
+** Core project header: must define t_cub3d, t_img and other project types.
+** Keep this header minimal (do not include heavy system headers here).
+*/
+# include "cub3d.h"
 
 #include <mlx.h>
 #include <math.h>
 #include <string.h>
 #include <sys/time.h>
 
+
 /* --- Render / gameplay constants --- */
-#ifndef WIDTH
-#define WIDTH 1248
-#endif
+# ifndef WIDTH
+#  define WIDTH 1248
+# endif
 
-#ifndef HEIGHT
-#define HEIGHT 960
-#endif
+# ifndef HEIGHT
+#  define HEIGHT 960
+# endif
 
-#define MOVE_SPEED 0.09
-#define ROT_SPEED 0.055
-#define MOUSE_SENSITIVITY 0.003
-#define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' \
+# define MOVE_SPEED 0.09
+# define ROT_SPEED 0.055
+# define MOUSE_SENSITIVITY 0.003
+# define IS_FLOOR(c) ((c) == '0' || (c) == 'N' || (c) == 'S' \
 	|| (c) == 'E' || (c) == 'W' || (c) == 'O')
 
-#define MINIMAP_SCALE 12
-#define MINIMAP_MARGIN 10
-#define MINIMAP_VIEW_RADIUS 5
+# define MINIMAP_SCALE 12
+# define MINIMAP_MARGIN 10
+# define MINIMAP_VIEW_RADIUS 5
 
-#define COLOR_WALL 0x404040
-#define COLOR_FLOOR 0x808080
-#define COLOR_PLAYER 0xFF0000
-#define COLOR_EMPTY 0x000000
+# define COLOR_WALL 0x404040
+# define COLOR_FLOOR 0x808080
+# define COLOR_PLAYER 0xFF0000
+# define COLOR_EMPTY 0x000000
 
-/* --- Grouped parameter structs (moved from raycast.c) --- */
+/*
+** Grouped parameter structs (moved from raycast.c)
+*/
 typedef struct s_col_geom
 {
 	int		x;
@@ -90,7 +108,9 @@ typedef struct s_tex_query
 	int	stepY;
 }				t_tex_query;
 
-/* moved minimap row context struct up with the other typedefs */
+/*
+** Minimap row context (used internally)
+*/
 typedef struct s_minimap_row_ctx
 {
 	int	j;
@@ -101,7 +121,44 @@ typedef struct s_minimap_row_ctx
 	int	color;
 }				t_minimap_row_ctx;
 
-/* Context struct to reduce number of local declarations in render_column */
+/*
+** New helper types to reduce function arguments (Norminette-friendly)
+*/
+
+/* Simple 2D integer point */
+typedef struct s_point
+{
+	int x;
+	int y;
+}				t_point;
+
+/* dda side distances grouped */
+typedef struct s_dda_side
+{
+	double sx;
+	double sy;
+}				t_dda_side;
+
+/* Return struct for target checking */
+typedef struct s_target
+{
+	int x;
+	int y;
+	int ok;
+}				t_target;
+
+/* Minimap drawing context: groups repeated args */
+typedef struct s_minimap_ctx
+{
+	t_cub3d	*cub;
+	t_img	*img;
+	int		start_x;
+	int		start_y;
+}				t_minimap_ctx;
+
+/*
+** Context struct to reduce locals in render_column
+*/
 typedef struct s_render_ctx
 {
 	t_dda_in		dda_in;
@@ -112,7 +169,10 @@ typedef struct s_render_ctx
 	int				*tex_buf;
 }				t_render_ctx;
 
-/* Forward declarations of functions (exported) */
+/*
+** Forward declarations (exported functions)
+** Prototypes wrapped to keep lines <= 80 columns.
+*/
 
 /* utils */
 int		get_wall_texture(int side, double rayDirX, double rayDirY);
@@ -124,34 +184,56 @@ int		minimap_cell_color(t_cub3d *cub, int map_y, int map_x);
 void	minimap_fill_cell(t_img *img, int base_x, int base_y, int color);
 void	minimap_draw_border(t_img *img, int draw_x, int draw_y);
 void	minimap_draw_cell(t_img *img, int draw_x, int draw_y, int color);
-void	minimap_draw_row(t_cub3d *cub, t_img *img, int i, int start_x, int start_y);
+void	minimap_draw_row(t_minimap_ctx *ctx, int i);
 
-/* minimap - player/composition */
-void	minimap_draw_cells(t_cub3d *cub, t_img *img, int minimap_start_x, int minimap_start_y);
-void	minimap_draw_player_square(t_img *img, int player_pixel_x, int player_pixel_y);
-void	minimap_draw_player_dir(t_img *img, int player_pixel_x, int player_pixel_y, t_vec2 *dir);
-void	minimap_compute_player_coords(t_cub3d *cub, int start_x, int start_y, int *out_x, int *out_y);
+/* minimap - player / composition */
+void	minimap_draw_cells(t_minimap_ctx *ctx);
+void	minimap_draw_player_square(t_img *img,
+			int player_pixel_x,
+			int player_pixel_y);
+void	minimap_draw_player_dir(t_img *img,
+			int player_pixel_x,
+			int player_pixel_y,
+			t_vec2 *dir);
+t_point	minimap_compute_player_coords(t_minimap_ctx *ctx);
 void	draw_minimap(t_cub3d *cub, t_img *img);
 
 /* textures and column drawing */
 int		*select_texture_buffer(t_cub3d *cub, t_tex_query *q);
 void	draw_column_ceiling(t_img *img, t_col_geom *g, int ceiling);
 void	draw_column_floor(t_img *img, t_col_geom *g, int floor);
-void	draw_column_floor_ceiling(t_img *img, t_col_geom *g, t_render_colors *cols);
-void	draw_textured_pixel(t_img *img, t_col_geom *g, int y, int color);
+void	draw_column_floor_ceiling(t_img *img,
+			t_col_geom *g,
+			t_render_colors *cols);
+void	draw_textured_pixel(t_img *img,
+			t_col_geom *g,
+			int y,
+			int color);
 
 /* column render */
-void	draw_column_textured(t_cub3d *cub, t_img *img, t_col_geom *g, int *tex_buf);
+void	draw_column_textured(t_cub3d *cub,
+			t_img *img,
+			t_col_geom *g,
+			int *tex_buf);
 void	compute_column_params(t_cub3d *cub, t_col_calc_in *in, t_col_geom *g);
 void	render_column_adjust_texx(t_col_geom *g, t_dda_in *dda_in, int tex_width);
-void	render_column(t_cub3d *cub, t_img *img, int x, t_render_colors *cols);
+void	render_column(t_cub3d *cub,
+			t_img *img,
+			int x,
+			t_render_colors *cols);
 void	raycast_render(t_cub3d *cub, t_img *img);
 
 /* DDA */
 void	init_delta_dist(t_dda_in *in, double *deltaDistX, double *deltaDistY);
-void	init_dda_steps(t_cub3d *cub, t_dda_in *in, t_dda_out *out, double *sideDistX, double *sideDistY);
-void	dda_step_update(t_dda_in *in, t_dda_out *out, double *sideDistX, double *sideDistY);
-void	compute_perp_wall_dist(t_dda_in *in, t_dda_out *out, double sideDistX, double sideDistY);
+t_dda_side	init_dda_steps(t_cub3d *cub, t_dda_in *in, t_dda_out *out);
+void	dda_step_update(t_dda_in *in,
+			t_dda_out *out,
+			double *sideDistX,
+			double *sideDistY);
+void	compute_perp_wall_dist(t_dda_in *in,
+			t_dda_out *out,
+			double sideDistX,
+			double sideDistY);
 int		perform_dda(t_cub3d *cub, t_dda_in *in, t_dda_out *out);
 
 /* doors */
@@ -161,8 +243,10 @@ int		is_same_as_player(t_cub3d *cub, int mx, int my);
 void	handle_door_action(t_cub3d *cub);
 
 /* door prompt */
-int		check_near_far_target(t_cub3d *cub, double near_d, double far_d, int *out_x, int *out_y);
-const char *select_door_message(char cell);
+t_target	check_near_far_target(t_cub3d *cub,
+			double near_d,
+			double far_d);
+const char	*select_door_message(char cell);
 void	draw_door_prompt(t_cub3d *cub);
 
 /* input */

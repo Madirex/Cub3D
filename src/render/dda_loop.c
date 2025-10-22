@@ -1,49 +1,10 @@
 #include "../../includes/cub3d_render.h"
 #include <math.h>
 
-/* DDA helpers and main DDA routine */
-
-/* Initialize delta distances (1/rayDir) */
-void init_delta_dist(t_dda_in *in, double *deltaDistX, double *deltaDistY)
-{
-	if (in->rayDirX == 0)
-		*deltaDistX = 1e30;
-	else
-		*deltaDistX = fabs(1.0 / in->rayDirX);
-	if (in->rayDirY == 0)
-		*deltaDistY = 1e30;
-	else
-		*deltaDistY = fabs(1.0 / in->rayDirY);
-}
-
-/* Initialize DDA steps and initial side distances */
-void init_dda_steps(t_cub3d *cub, t_dda_in *in, t_dda_out *out, double *sideDistX, double *sideDistY)
-{
-	double	deltaDistX;
-	double	deltaDistY;
-
-	init_delta_dist(in, &deltaDistX, &deltaDistY);
-	if (in->rayDirX < 0)
-	{
-		out->stepX = -1;
-		*sideDistX = (cub->pos_x - in->mapX) * deltaDistX;
-	}
-	else
-	{
-		out->stepX = 1;
-		*sideDistX = (in->mapX + 1.0 - cub->pos_x) * deltaDistX;
-	}
-	if (in->rayDirY < 0)
-	{
-		out->stepY = -1;
-		*sideDistY = (cub->pos_y - in->mapY) * deltaDistY;
-	}
-	else
-	{
-		out->stepY = 1;
-		*sideDistY = (in->mapY + 1.0 - cub->pos_y) * deltaDistY;
-	}
-}
+/*
+** DDA loop helpers and main DDA routine (kept in a separate TU to respect
+** the limit on number of functions per file).
+*/
 
 /* Perform one DDA step update */
 void dda_step_update(t_dda_in *in, t_dda_out *out, double *sideDistX, double *sideDistY)
@@ -101,8 +62,11 @@ int perform_dda(t_cub3d *cub, t_dda_in *in, t_dda_out *out)
 {
 	double	sideDistX;
 	double	sideDistY;
+	t_dda_side sides;
 
-	init_dda_steps(cub, in, out, &sideDistX, &sideDistY);
+	sides = init_dda_steps(cub, in, out);
+	sideDistX = sides.sx;
+	sideDistY = sides.sy;
 	while (1)
 	{
 		dda_step_update(in, out, &sideDistX, &sideDistY);

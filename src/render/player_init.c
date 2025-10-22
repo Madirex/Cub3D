@@ -1,5 +1,6 @@
 #include "../../includes/cub3d_render.h"
 #include <string.h>
+#include <math.h>
 
 /* Find player start on the map and initialize player state */
 

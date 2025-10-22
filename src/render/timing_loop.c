@@ -1,5 +1,6 @@
 #include "../../includes/cub3d_render.h"
 #include <sys/time.h>
+#include <mlx.h>
 
 /* Time helpers, door animation update and render loop */
 
