@@ -37,7 +37,7 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code)
 
 	if (cub)
 	{
-		if (cub->fd)
+		if (cub->fd >= 0)
 			close(cub->fd);
 		if (cub->img && cub->mlx)
 			mlx_destroy_image(cub->mlx, cub->img);

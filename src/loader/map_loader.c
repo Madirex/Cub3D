@@ -6,7 +6,7 @@
 /*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:58:49 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/10/22 15:51:53 by anmateo-         ###   ########.fr       */
+/*   Updated: 2025/10/23 06:51:47 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@
 #include "../../includes/parse_map.h"
 
 void	assign_texture(t_cub3d *cub, char *line);
-void	validate_textures(t_cub3d *cub);
 
 /**
  * @brief Processes a line containing texture or color configuration
@@ -167,5 +166,4 @@ void	read_map(t_cub3d *cub)
 	}
 	free(ctx.line);
 	print_textures_debug(cub);
-	validate_textures(cub);
 }

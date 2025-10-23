@@ -62,7 +62,7 @@ void	open_and_parse_map(t_cub3d *cub, char *map_path)
 		safe_exit(cub, NULL, 1);
 	}
 	cub->fd = open(map_path, O_RDONLY);
-	if (!cub->fd)
+	if (cub->fd < 0)
 		safe_exit(cub, NULL, 1);
 	read_map(cub);
 	validate_textures(cub);
@@ -95,22 +95,6 @@ void	get_image_data(t_cub3d *cub)
 }
 
 /**
- * @brief Initializes MLX pointers for window and image
- * 
- * Sets up the MLX instance, creates a new window,
- * and initializes the image buffer.
- * 
- * @param cub Pointer to the main Cub3D structure
- * @param mlx Pointer to the MLX instance
- */
-void	init_mlx_pointers(t_cub3d *cub, void *mlx)
-{
-	cub->mlx = mlx;
-	cub->win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
-	cub->img = mlx_new_image(mlx, WIDTH, HEIGHT);
-}
-
-/**
  * @brief Sets up event hooks and starts the main loop
  * 
  * Configures key press/release, window close, mouse movement,
@@ -138,14 +122,14 @@ void	setup_hooks_and_run(t_cub3d *cub)
 int	main(int argc, char *argv[])
 {
 	t_cub3d		cub;
-	void		*mlx;
 
 	(void) argc;
 	init_cub3d(&cub, IS_BONUS);
 	open_and_parse_map(&cub, argv[1]);
 	close(cub.fd);
-	mlx = mlx_init();
-	init_mlx_pointers(&cub, mlx);
+	cub.mlx = mlx_init();
+	cub.win = mlx_new_window(cub.mlx, WIDTH, HEIGHT, "Cub3D");
+	cub.img = mlx_new_image(cub.mlx, WIDTH, HEIGHT);
 	get_image_data(&cub);
 	load_wall_textures(&cub, cub.mlx);
 	cub.last_mouse_x = WIDTH / 2;
