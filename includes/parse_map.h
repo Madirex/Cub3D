@@ -6,7 +6,7 @@
 /*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:59:31 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/07/04 13:59:32 by anmateo-         ###   ########.fr       */
+/*   Updated: 2025/10/22 15:52:04 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,6 @@ typedef struct s_map_parse_ctx
 
 void	assign_map(t_cub3d *cub, char *filename);
 int		is_map_line(const char *line, t_cub3d *cub);
-void	read_map(int fd, t_cub3d *cub);
+void	read_map(t_cub3d *cub);
 
 #endif

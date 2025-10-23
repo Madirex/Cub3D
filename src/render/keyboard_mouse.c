@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   keyboard_mouse.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:30:39 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:33:58 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 15:44:03 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/cub3d_render.h"
+
+void	safe_exit(t_cub3d *cub, char *line, int exit_code);
 
 /* Input callbacks (keyboard & mouse) */
 
@@ -26,7 +28,7 @@ int	handle_key_press(int key, t_cub3d *cub)
 	else if (key == 100 || key == 65363)
 		cub->is_rotating_right = 1;
 	else if (key == 65307)
-		return (exit_program(cub));
+		safe_exit(cub, NULL, 0);
 	else if (key == 49 || key == 32 || key == 65349)
 		handle_door_action(cub);
 	return (0);

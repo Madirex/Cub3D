@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_loader.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:58:49 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/10/22 14:43:34 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 15:51:53 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,10 +140,9 @@ static char	*expand_line_buffer(char *line, int *cap, int len, t_cub3d *cub)
  * texture/color configuration until the map section is reached.
  * Handles dynamic buffer expansion and validates textures after parsing.
  * 
- * @param fd File descriptor of the .cub file to read
  * @param cub Pointer to the main Cub3D structure to populate
  */
-void	read_map(int fd, t_cub3d *cub)
+void	read_map(t_cub3d *cub)
 {
 	t_readmap_ctx	ctx;
 
@@ -153,7 +152,7 @@ void	read_map(int fd, t_cub3d *cub)
 	ctx.stop = 0;
 	if (!ctx.line)
 		ft_error("Memory allocation failed for line", cub, NULL);
-	ctx.n = read(fd, &ctx.c, 1);
+	ctx.n = read(cub->fd, &ctx.c, 1);
 	while (!ctx.stop && ctx.n > 0)
 	{
 		if (ctx.c == '\n')
@@ -164,7 +163,7 @@ void	read_map(int fd, t_cub3d *cub)
 			if (ctx.len + 1 >= ctx.cap)
 				ctx.line = expand_line_buffer(ctx.line, &ctx.cap, ctx.len, cub);
 		}
-		ctx.n = read(fd, &ctx.c, 1);
+		ctx.n = read(cub->fd, &ctx.c, 1);
 	}
 	free(ctx.line);
 	print_textures_debug(cub);

@@ -33,11 +33,40 @@
  */
 void	safe_exit(t_cub3d *cub, char *line, int exit_code)
 {
+	int	i;
+
 	if (cub)
 	{
+		if (cub->fd)
+			close(cub->fd);
+		if (cub->img && cub->mlx)
+			mlx_destroy_image(cub->mlx, cub->img);
+		if (cub->win && cub->mlx)
+			mlx_destroy_window(cub->mlx, cub->win);
+		if (cub->wall_textures)
+		{
+			i = 0;
+			while (i < 4)
+				free(cub->wall_textures[i++]);
+			free(cub->wall_textures);
+		}
+		if (cub->door_textures)
+		{
+			i = 0;
+			while (i < 4)
+				free(cub->door_textures[i++]);
+			free(cub->door_textures);
+		}
 		free_textures(&cub->textures);
 		if (cub->map)
 			free_map(cub->map, cub->map_height);
+		if (cub->mlx)
+		{
+			mlx_loop_end(cub->mlx);
+			mlx_destroy_display(cub->mlx);
+			free(cub->mlx);
+			cub->mlx = NULL;
+		}
 	}
 	if (line)
 		free(line);
@@ -113,15 +142,6 @@ void	init_cub3d(t_cub3d *cub, int is_bonus)
  */
 int	exit_program(t_cub3d *cub)
 {
-	if (!cub)
-		exit(0);
-	if (cub->img && cub->mlx)
-		mlx_destroy_image(cub->mlx, cub->img);
-	if (cub->win && cub->mlx)
-		mlx_destroy_window(cub->mlx, cub->win);
-	free_textures(&cub->textures);
-	if (cub->map)
-		free_map(cub->map, cub->map_height);
-	exit(0);
+	safe_exit(cub, NULL, 0);
 	return (0);
 }

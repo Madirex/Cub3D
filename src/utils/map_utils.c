@@ -6,7 +6,7 @@
 /*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 17:27:44 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/10/22 07:07:54 by anmateo-         ###   ########.fr       */
+/*   Updated: 2025/10/23 03:10:51 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,14 @@ void	free_textures(t_textures *textures)
 		free(textures->we);
 	if (textures->ea)
 		free(textures->ea);
+	if (textures->door_closed)
+		free(textures->door_closed);
+	if (textures->door_closed_2)
+		free(textures->door_closed_2);
+	if (textures->door_closed_3)
+		free(textures->door_closed_3);
+	if (textures->door_open)
+		free(textures->door_open);
 }
 
 /**

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   doors_loader.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 12:48:38 by skyce11           #+#    #+#             */
-/*   Updated: 2025/10/22 15:09:30 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/23 03:57:34 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+void	safe_exit(t_cub3d *cub, char *line, int exit_code);
 
 /*
 ** Initialize door_textures array and check malloc.
@@ -25,7 +27,7 @@ void	init_door_textures_array(t_cub3d *cub)
 	if (!cub->door_textures)
 	{
 		fprintf(stderr, "Error: malloc falló door_textures\n");
-		exit(1);
+		safe_exit(cub, NULL, 1);
 	}
 }
 
@@ -58,15 +60,13 @@ void	load_door_frames(t_cub3d *cub, void *mlx, int *w, int *h)
 */
 void	set_door_open_texture(t_cub3d *cub, void *mlx, int *tmp_w, int *tmp_h)
 {
-	int	*buf_open;
-
 	if (cub->textures.door_open == NULL)
 	{
 		cub->door_textures[3] = NULL;
 		return ;
 	}
-	buf_open = load_xpm_buffer(mlx, cub->textures.door_open, tmp_w, tmp_h);
-	cub->door_textures[3] = buf_open;
+	cub->door_textures[3] = load_xpm_buffer(
+			mlx, cub->textures.door_open, tmp_w, tmp_h);
 }
 
 /*
@@ -93,6 +93,6 @@ void	load_doors(t_cub3d *cub, void *mlx, int *w, int *h)
 	if (!cub->door_textures[0])
 	{
 		fprintf(stderr, "Error: door texture definida pero fallo al cargar\n");
-		exit(1);
+		safe_exit(cub, NULL, 1);
 	}
 }
