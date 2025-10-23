@@ -46,14 +46,14 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code)
 		if (cub->wall_textures)
 		{
 			i = 0;
-			while (i < 4)
+			while (i < 4 && cub->wall_textures[i])
 				free(cub->wall_textures[i++]);
 			free(cub->wall_textures);
 		}
 		if (cub->door_textures)
 		{
 			i = 0;
-			while (i < 4)
+			while (i < 4 && cub->door_textures[i])
 				free(cub->door_textures[i++]);
 			free(cub->door_textures);
 		}
@@ -62,8 +62,6 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code)
 			free_map(cub->map, cub->map_height);
 		if (cub->mlx)
 		{
-			mlx_loop_end(cub->mlx);
-			mlx_destroy_display(cub->mlx);
 			free(cub->mlx);
 			cub->mlx = NULL;
 		}
