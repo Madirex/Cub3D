@@ -24,6 +24,8 @@
 #include "../../includes/map_utils.h"
 #include <mlx.h>
 
+void	cleanup_all_textures(t_cub3d *cub);
+
 /**
  * @brief Safely exits the program after cleaning up resources
  * 
@@ -33,8 +35,6 @@
  */
 void	safe_exit(t_cub3d *cub, char *line, int exit_code)
 {
-	int	i;
-
 	if (cub)
 	{
 		if (cub->fd >= 0)
@@ -43,21 +43,7 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code)
 			mlx_destroy_image(cub->mlx, cub->img);
 		if (cub->win && cub->mlx)
 			mlx_destroy_window(cub->mlx, cub->win);
-		if (cub->wall_textures)
-		{
-			i = 0;
-			while (i < 4 && cub->wall_textures[i])
-				free(cub->wall_textures[i++]);
-			free(cub->wall_textures);
-		}
-		if (cub->door_textures)
-		{
-			i = 0;
-			while (i < 4 && cub->door_textures[i])
-				free(cub->door_textures[i++]);
-			free(cub->door_textures);
-		}
-		free_textures(&cub->textures);
+		cleanup_all_textures(cub);
 		if (cub->map)
 			free_map(cub->map, cub->map_height);
 		if (cub->mlx)

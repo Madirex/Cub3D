@@ -24,6 +24,7 @@ SRC_FILES   = main \
 			  loader/texture_loader \
 			  utils/utils \
 			  utils/assign_utils \
+			  utils/cleanup_utils \
 			  utils/map_utils \
 			  render/column_render \
 			  render/dda_init \

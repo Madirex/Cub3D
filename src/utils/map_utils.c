@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: anmateo- <anmateo-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 17:27:44 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/10/23 03:10:51 by anmateo-         ###   ########.fr       */
+/*   Updated: 2025/10/23 07:19:13 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,33 +54,6 @@ int	is_step_char(char c)
 {
 	return (c == 'N' || c == 'S' || c == 'E'
 		|| c == 'W' || c == '0' || c == 'D' || c == 'd');
-}
-
-/**
- * @brief Frees all allocated texture memory
- * 
- * Safely frees all texture path strings in the textures structure.
- * 
- * @param textures Pointer to the textures structure
- */
-void	free_textures(t_textures *textures)
-{
-	if (textures->no)
-		free(textures->no);
-	if (textures->so)
-		free(textures->so);
-	if (textures->we)
-		free(textures->we);
-	if (textures->ea)
-		free(textures->ea);
-	if (textures->door_closed)
-		free(textures->door_closed);
-	if (textures->door_closed_2)
-		free(textures->door_closed_2);
-	if (textures->door_closed_3)
-		free(textures->door_closed_3);
-	if (textures->door_open)
-		free(textures->door_open);
 }
 
 /**

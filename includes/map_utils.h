@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_utils.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: anmateo- <anmateo-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 17:25:46 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/07/09 17:25:47 by anmateo-         ###   ########.fr       */
+/*   Updated: 2025/10/23 07:18:59 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 
 # include "cub3d.h"
 
-void	free_textures(t_textures *textures);
+void	cleanup_all_textures(t_cub3d *cub);
 void	free_map(char **map, int height);
 int		is_map_line(const char *line, t_cub3d *cub);
 
