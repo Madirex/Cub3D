@@ -63,7 +63,7 @@ void	open_and_parse_map(t_cub3d *cub, char *map_path)
 	}
 	cub->fd = open(map_path, O_RDONLY);
 	if (cub->fd < 0)
-		safe_exit(cub, NULL, 1);
+		ft_error("Error: Could not open map file", cub, NULL);
 	read_map(cub);
 	validate_textures(cub);
 	assign_map(cub, map_path);

@@ -83,9 +83,12 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code)
  */
 void	ft_error(char *message, t_cub3d *cub, char *line)
 {
-	printf("Error\n");
+	write(2, "Error\n", 6);
 	if (message)
-		printf("%s\n", message);
+	{
+		write(2, message, ft_strlen(message));
+		write(2, "\n", 1);
+	}
 	safe_exit(cub, line, 1);
 }
 
