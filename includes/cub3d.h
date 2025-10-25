@@ -86,6 +86,8 @@ typedef struct s_cub3d
 	// --- Añadidos para raycasting y MLX ---
 	int			is_moving_forward;
 	int			is_moving_backward;
+	int			is_moving_left;
+	int			is_moving_right;
 	int			is_rotating_left;
 	int			is_rotating_right;
 	double		pos_x;		// Posición real X (con decimales)
