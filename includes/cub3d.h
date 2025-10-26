@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:59:20 by anmateo-          #+#    #+#             */
-/*   Updated: 2025/10/22 15:04:13 by migonzal         ###   ########.fr       */
+/*   Updated: 2025/10/22 15:52:52 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ typedef struct s_cub3d
 	int			player_x;	/**< Player X position on map */
 	int			player_y;	/**< Player Y position on map */
 	char		player_dir;	/**< Player initial direction (N/S/E/W) */
+	int			fd;
 	int			**wall_textures;
 	int			**door_textures;
 	int			door_anim_frame;	/**< Current animation frame (0, 1, 2) */
@@ -85,6 +86,8 @@ typedef struct s_cub3d
 	// --- Añadidos para raycasting y MLX ---
 	int			is_moving_forward;
 	int			is_moving_backward;
+	int			is_moving_left;
+	int			is_moving_right;
 	int			is_rotating_left;
 	int			is_rotating_right;
 	double		pos_x;		// Posición real X (con decimales)
@@ -124,7 +127,7 @@ typedef struct s_readmap_ctx
 	int		stop;	/**< Stop flag */
 }	t_readmap_ctx;
 
-int		open_and_parse_map(t_cub3d *cub, char *map_path);
+void	open_and_parse_map(t_cub3d *cub, char *map_path);
 void	init_mlx_and_game(t_cub3d *cub);
 void	setup_hooks_and_run(t_cub3d *cub);
 void	free_game_resources(t_cub3d *cub);

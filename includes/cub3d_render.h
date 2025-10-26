@@ -257,6 +257,8 @@ int			handle_mouse_move(int x, int y, t_cub3d *cub);
 /* movement */
 void		move_forward(t_cub3d *cub, double move_speed_dt);
 void		move_backward(t_cub3d *cub, double move_speed_dt);
+void		move_left(t_cub3d *cub, double move_speed_dt);
+void		move_right(t_cub3d *cub, double move_speed_dt); 
 void		rotate_right(t_cub3d *cub, double rot_speed_dt);
 void		rotate_left(t_cub3d *cub, double rot_speed_dt);
 void		perform_movements(t_cub3d *cub);

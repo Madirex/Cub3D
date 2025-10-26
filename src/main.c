@@ -54,18 +54,22 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code);
  * @param map_path Path to the map file
  * @return File descriptor of the opened map file
  */
-int	open_and_parse_map(t_cub3d *cub, char *map_path)
+void	open_and_parse_map(t_cub3d *cub, char *map_path)
 {
-	int	fd;
-
-	fd = open(map_path, O_RDONLY);
-	read_map(fd, cub);
+	if (!map_path)
+	{
+		printf("Usage: ./cub3D <map>");
+		safe_exit(cub, NULL, 1);
+	}
+	cub->fd = open(map_path, O_RDONLY);
+	if (cub->fd < 0)
+		ft_error("Error: Could not open map file", cub, NULL);
+	read_map(cub);
 	validate_textures(cub);
 	assign_map(cub, map_path);
 	validate_map(cub);
 	init_player(cub);
 	print_map_debug(cub);
-	return (fd);
 }
 
 /**
@@ -88,27 +92,6 @@ void	get_image_data(t_cub3d *cub)
 	cub->bpp = bpp;
 	cub->size_line = size_line;
 	cub->endian = endian;
-}
-
-/**
- * @brief Initializes MLX pointers for window and image
- * 
- * Sets up the MLX instance, creates a new window,
- * and initializes the image buffer.
- * 
- * @param cub Pointer to the main Cub3D structure
- * @param mlx Pointer to the MLX instance
- */
-void	init_mlx_pointers(t_cub3d *cub, void *mlx)
-{
-	void	*win;
-	void	*img;
-
-	cub->mlx = mlx;
-	win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cub3D");
-	img = mlx_new_image(mlx, WIDTH, HEIGHT);
-	cub->win = win;
-	cub->img = img;
 }
 
 /**
@@ -138,16 +121,15 @@ void	setup_hooks_and_run(t_cub3d *cub)
  */
 int	main(int argc, char *argv[])
 {
-	int			fd;
 	t_cub3d		cub;
-	void		*mlx;
 
 	(void) argc;
 	init_cub3d(&cub, IS_BONUS);
-	fd = open_and_parse_map(&cub, argv[1]);
-	close(fd);
-	mlx = mlx_init();
-	init_mlx_pointers(&cub, mlx);
+	open_and_parse_map(&cub, argv[1]);
+	close(cub.fd);
+	cub.mlx = mlx_init();
+	cub.win = mlx_new_window(cub.mlx, WIDTH, HEIGHT, "Cub3D");
+	cub.img = mlx_new_image(cub.mlx, WIDTH, HEIGHT);
 	get_image_data(&cub);
 	load_wall_textures(&cub, cub.mlx);
 	cub.last_mouse_x = WIDTH / 2;

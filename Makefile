@@ -4,7 +4,7 @@ OBJS_DIR    = ./obj/
 LIB_DIR     = ./libs/
 INCLUDE     = -I./includes -I$(LIB_DIR)minilibx-linux -I$(LIB_DIR)libft
 MFLAGS      = -L$(LIB_DIR)minilibx-linux -lmlx -lXext -lX11 -lm -lz
-CFLAGS      = -Wall -Werror -Wextra -g
+CFLAGS      = -Wall -Werror -Wextra -g3
 LIBFT_PATH  = $(LIB_DIR)libft/libft.a
 
 SRC_FILES   = main \
@@ -24,6 +24,7 @@ SRC_FILES   = main \
 			  loader/texture_loader \
 			  utils/utils \
 			  utils/assign_utils \
+			  utils/cleanup_utils \
 			  utils/map_utils \
 			  render/column_render \
 			  render/dda_init \

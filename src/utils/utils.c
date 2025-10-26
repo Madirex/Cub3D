@@ -24,6 +24,8 @@
 #include "../../includes/map_utils.h"
 #include <mlx.h>
 
+void	cleanup_all_textures(t_cub3d *cub);
+
 /**
  * @brief Safely exits the program after cleaning up resources
  * 
@@ -35,9 +37,20 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code)
 {
 	if (cub)
 	{
-		free_textures(&cub->textures);
+		if (cub->fd >= 0)
+			close(cub->fd);
+		if (cub->img && cub->mlx)
+			mlx_destroy_image(cub->mlx, cub->img);
+		if (cub->win && cub->mlx)
+			mlx_destroy_window(cub->mlx, cub->win);
+		cleanup_all_textures(cub);
 		if (cub->map)
 			free_map(cub->map, cub->map_height);
+		if (cub->mlx)
+		{
+			free(cub->mlx);
+			cub->mlx = NULL;
+		}
 	}
 	if (line)
 		free(line);
@@ -56,9 +69,12 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code)
  */
 void	ft_error(char *message, t_cub3d *cub, char *line)
 {
-	printf("Error\n");
+	write(2, "Error\n", 6);
 	if (message)
-		printf("%s\n", message);
+	{
+		write(2, message, ft_strlen(message));
+		write(2, "\n", 1);
+	}
 	safe_exit(cub, line, 1);
 }
 
@@ -113,15 +129,6 @@ void	init_cub3d(t_cub3d *cub, int is_bonus)
  */
 int	exit_program(t_cub3d *cub)
 {
-	if (!cub)
-		exit(0);
-	if (cub->img && cub->mlx)
-		mlx_destroy_image(cub->mlx, cub->img);
-	if (cub->win && cub->mlx)
-		mlx_destroy_window(cub->mlx, cub->win);
-	free_textures(&cub->textures);
-	if (cub->map)
-		free_map(cub->map, cub->map_height);
-	exit(0);
+	safe_exit(cub, NULL, 0);
 	return (0);
 }

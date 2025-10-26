@@ -21,9 +21,13 @@ int	handle_key_press(int key, t_cub3d *cub)
 		cub->is_moving_forward = 1;
 	else if (key == 115)
 		cub->is_moving_backward = 1;
-	else if (key == 97 || key == 65361)
+	else if (key == 97)
+		cub->is_moving_left = 1;
+	else if (key == 65361)
 		cub->is_rotating_left = 1;
-	else if (key == 100 || key == 65363)
+	else if (key == 100)
+		cub->is_moving_right = 1;
+	else if (key == 65363)
 		cub->is_rotating_right = 1;
 	else if (key == 65307)
 		return (exit_program(cub));
@@ -39,9 +43,13 @@ int	handle_key_release(int key, t_cub3d *cub)
 		cub->is_moving_forward = 0;
 	else if (key == 115)
 		cub->is_moving_backward = 0;
-	else if (key == 97 || key == 65361)
+	else if (key == 97)
+		cub->is_moving_left = 0;
+	else if (key == 65361)
 		cub->is_rotating_left = 0;
-	else if (key == 100 || key == 65363)
+	else if (key == 100)
+		cub->is_moving_right = 0;
+	else if (key == 65363)
 		cub->is_rotating_right = 0;
 	return (0);
 }

@@ -5,27 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/22 14:30:26 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 15:38:57 by migonzal         ###   ########.fr       */
+/*   Created: 2025/10/22 14:30:39 by migonzal          #+#    #+#             */
+/*   Updated: 2025/10/22 14:33:58 by migonzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   movement.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: migonzal <migonzal@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/22 14:30:26 by migonzal          #+#    #+#             */
-/*   Updated: 2025/10/22 14:33:13 by migonzal         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "../includes/cub3d_render.h"
+#include "../../includes/cub3d_render.h"
 #include <math.h>
-
-/* Movement and rotation helpers and orchestrator */
 
 /* Move forward with collision checks */
 void	move_forward(t_cub3d *cub, double move_speed_dt)
@@ -47,6 +33,28 @@ void	move_backward(t_cub3d *cub, double move_speed_dt)
 	if (is_floor(cub->map[(int)(cub->pos_y - cub->dir_y * move_speed_dt)]
 		[(int)(cub->pos_x)]))
 		cub->pos_y -= cub->dir_y * move_speed_dt;
+}
+
+/* Strafe left (use camera plane vector) */
+void	move_left(t_cub3d *cub, double move_speed_dt)
+{
+	if (is_floor(cub->map[(int)(cub->pos_y)]
+		[(int)(cub->pos_x - cub->plane_x * move_speed_dt)]))
+		cub->pos_x -= cub->plane_x * move_speed_dt;
+	if (is_floor(cub->map[(int)(cub->pos_y - cub->plane_y * move_speed_dt)]
+		[(int)(cub->pos_x)]))
+		cub->pos_y -= cub->plane_y * move_speed_dt;
+}
+
+/* Strafe right (use camera plane vector) */
+void	move_right(t_cub3d *cub, double move_speed_dt)
+{
+	if (is_floor(cub->map[(int)(cub->pos_y)]
+		[(int)(cub->pos_x + cub->plane_x * move_speed_dt)]))
+		cub->pos_x += cub->plane_x * move_speed_dt;
+	if (is_floor(cub->map[(int)(cub->pos_y + cub->plane_y * move_speed_dt)]
+		[(int)(cub->pos_x)]))
+		cub->pos_y += cub->plane_y * move_speed_dt;
 }
 
 /* Rotate right by angle (used by perform_movements) */
@@ -97,6 +105,10 @@ void	perform_movements(t_cub3d *cub)
 		move_forward(cub, move_speed_dt);
 	if (cub->is_moving_backward)
 		move_backward(cub, move_speed_dt);
+	if (cub->is_moving_left)
+		move_left(cub, move_speed_dt);
+	if (cub->is_moving_right)
+		move_right(cub, move_speed_dt);
 	if (cub->is_rotating_right)
 		rotate_right(cub, rot_speed_dt);
 	if (cub->is_rotating_left)
