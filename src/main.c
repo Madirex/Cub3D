@@ -57,10 +57,7 @@ void	safe_exit(t_cub3d *cub, char *line, int exit_code);
 void	open_and_parse_map(t_cub3d *cub, char *map_path)
 {
 	if (!map_path)
-	{
-		printf("Usage: ./cub3D <map>");
-		safe_exit(cub, NULL, 1);
-	}
+		ft_error("Usage: ./cub3D <map>", cub, NULL);
 	cub->fd = open(map_path, O_RDONLY);
 	if (cub->fd < 0)
 		ft_error("Error: Could not open map file", cub, NULL);
