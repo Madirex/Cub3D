@@ -35,6 +35,7 @@ SRC_FILES   = main \
 			  render/minimap_cells \
 			  render/minimap_player \
 			  render/movement \
+			  render/rotation \
 			  render/player_dirs \
 			  render/player_init \
 			  render/textures_and_columns \
