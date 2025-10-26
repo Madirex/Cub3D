@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d_render.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anmateo- <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: anmateo- <anmateo-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 11:55:47 by skyce11           #+#    #+#             */
-/*   Updated: 2025/10/22 12:08:50 by anmateo-         ###   ########.fr       */
+/*   Updated: 2025/10/26 05:28:22 by anmateo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,6 @@ typedef struct s_render_ctx
 int			is_floor(char c);
 
 /* loader (textures) */
-
 void		copy_image_to_buffer(char *data, int bpp,
 				int *buffer, long count);
 int			*load_xpm_err(void *mlx, void *img,
@@ -258,7 +257,7 @@ int			handle_mouse_move(int x, int y, t_cub3d *cub);
 void		move_forward(t_cub3d *cub, double move_speed_dt);
 void		move_backward(t_cub3d *cub, double move_speed_dt);
 void		move_left(t_cub3d *cub, double move_speed_dt);
-void		move_right(t_cub3d *cub, double move_speed_dt); 
+void		move_right(t_cub3d *cub, double move_speed_dt);
 void		rotate_right(t_cub3d *cub, double rot_speed_dt);
 void		rotate_left(t_cub3d *cub, double rot_speed_dt);
 void		perform_movements(t_cub3d *cub);
